@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="renderer" content="webkit">
+
+  
+  <title>JavaEnterprise_Architect_001 | Ant-loiter个人博客</title>
+
+  <link rel="shortcut icon" href="/images/favicon.png">
+  <link rel="alternate" href="/atom.xml" title="Ant-loiter个人博客">
+  <meta name="description" content="分布式事务这深入理解？2PC、3PC及TCC协议 什么是分布式事务其实分布式事务从实质上看与数据库事务的概念是一致的， 既然是事务也就需要满足事务的基本特征（ACID）， 只是分布式事务相对于本地事务而言其表现形式有很大的不同， 如， 一个jvm进程中如果需要同时操作数据库的多条记录， 而这些操作需要在一个事务中，那么我们可以通过数据库的事务机制（一般的数据库锁）来实现。  而随着这个jvm进程（">
+<meta name="keywords" content="Java Enterprise Architest Info">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaEnterprise_Architect_001">
+<meta property="og:url" content="https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/index.html">
+<meta property="og:site_name" content="Ant-loiter个人博客">
+<meta property="og:description" content="分布式事务这深入理解？2PC、3PC及TCC协议 什么是分布式事务其实分布式事务从实质上看与数据库事务的概念是一致的， 既然是事务也就需要满足事务的基本特征（ACID）， 只是分布式事务相对于本地事务而言其表现形式有很大的不同， 如， 一个jvm进程中如果需要同时操作数据库的多条记录， 而这些操作需要在一个事务中，那么我们可以通过数据库的事务机制（一般的数据库锁）来实现。  而随着这个jvm进程（">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://www.ant-loiter.com/img/redis-cache-strage.png">
+<meta property="og:updated_time" content="2020-10-30T13:49:33.118Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaEnterprise_Architect_001">
+<meta name="twitter:description" content="分布式事务这深入理解？2PC、3PC及TCC协议 什么是分布式事务其实分布式事务从实质上看与数据库事务的概念是一致的， 既然是事务也就需要满足事务的基本特征（ACID）， 只是分布式事务相对于本地事务而言其表现形式有很大的不同， 如， 一个jvm进程中如果需要同时操作数据库的多条记录， 而这些操作需要在一个事务中，那么我们可以通过数据库的事务机制（一般的数据库锁）来实现。  而随着这个jvm进程（">
+<meta name="twitter:image" content="https://www.ant-loiter.com/img/redis-cache-strage.png">
+
+  <meta name="keywords" content=",Java Enterprise Architest Info">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="theme-color" content="#9C27B0">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Ant-loiter个人博客">
+  <meta name="msapplication-starturl" content="https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/">
+  <meta name="msapplication-navbutton-color" content="#9C27B0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ant-loiter个人博客">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
+
+  
+    <link rel="canonical" href="https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/">
+  
+
+  
+  
+
+  
+  
+  
+
+  <link rel="stylesheet" href="/css/mdui.css">
+<link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/custom.css">
+</head>
+<body class="mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+  <script>var a=localStorage.getItem("mdui-theme-layout-dark");if(a){document.getElementsByTagName("body")[0].className+=" mdui-theme-layout-dark"};</script>
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(!a){document.getElementsByTagName("body")[0].className+=" mdui-drawer-body-left"};</script>
+  <header id="header" class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-appbar-inset">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="mdui-icon material-icons">menu</i></a>
+    <a href="/" class="mdui-typo-headline">Ant-loiter个人博客</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-dialog="{target: '#search'}" mdui-tooltip="{content: 'Search'}"><i class="mdui-icon material-icons">search</i></a>
+    <a href="/atom.xml" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'RSS'}"><i class="mdui-icon material-icons">rss_feed</i></a>
+  </div>
+</header>
+<div class="mdui-dialog" id="search">
+  
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="请输入关键字"><input type="hidden" name="sitesearch" value="https://www.ant-loiter.com"></form>
+    <div class="search-result"></div>
+  
+</div>
+  <aside id="sidebar" class="mdui-drawer mdui-drawer-full-height">
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(a){document.getElementById("sidebar").className+=" mdui-drawer-close"};</script>
+  <div class="mdui-grid-tile">
+    <img src="/images/banner.png" style="height: 160px;">
+    <img src="/images/avatar.png" class="avatar-animation" style="position: absolute; top: 10%; left: 24px; width: 64px; height: 64px; border: 2px solid #fff; border-radius: 50%;">
+    <div class="mdui-grid-tile-actions">
+      <div class="mdui-grid-tile-text">
+        <div class="mdui-grid-tile-title">chenhj(brenda)</div>
+        <div class="mdui-grid-tile-subtitle"><i class="mdui-icon material-icons">art_track</i>www.ant-loiter.com</div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    <a href="/" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-blue">home</i>
+      <div class="mdui-list-item-content">Home</div>
+    </a>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-deep-orange">archive</i>
+        <div class="mdui-list-item-content">Archive</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/archives/2020/08/">八月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="mdui-ripple sidebar_archives-count">7</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/07/">七月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/06/">六月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/05/">五月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/04/">四月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/03/">三月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/02/">二月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/01/">一月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/12/">十二月 2018<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="mdui-ripple sidebar_archives-count">21</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/10/">十月 2018<span class="mdui-ripple sidebar_archives-count">8</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="mdui-ripple sidebar_archives-count">6</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-green">class</i>
+        <div class="mdui-list-item-content">Category</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/categories/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/MySQL-config/">MySQL config<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RabbitMQ-MQ-消息队列/">RabbitMQ MQ 消息队列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/apache-压力测试工具/">apache 压力测试工具<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/centos7防火墙-firewalld/">centos7防火墙 firewalld<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/cms-jvm-gc-Throught-Serial/">cms jvm gc Throught Serial<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/docker-mysql-pull/">docker mysql pull<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/elasticSearch-es/">elasticSearch es<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/spring-cloud-springboot-service/">spring cloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/微服务网关路由-GateWay/">微服务网关路由 GateWay<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/服务注册-Consul-Eureka-confi-SpringCloud/">服务注册 Consul Eureka confi SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构-MySQL/">架构 MySQL<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构性能分析/">架构性能分析<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-brown">bookmark</i>
+        <div class="mdui-list-item-content">Tag</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/tags/BigData-Spark-MapReduce/">BigData Spark MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ES-TS-JS/">ES TS JS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Egg-Alibaba-Node-js-Koa/">Egg Alibaba Node.js Koa<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/HBase-zookeeper-BigData/">HBase zookeeper BigData<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Linux-Centos-Nginx-Let’Encrypt-ssl-TLS/">Linux Centos Nginx Let’Encrypt ssl TLS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/MySQL-config-my-conf-案例/">MySQL config my.conf 案例<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Nginx-content-static-auto-index-index-random-index-concat/">Nginx content static auto_index index random_index concat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/PM-liangning-得到/">PM liangning 得到<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RabbitMQ-AMQP-对列/">RabbitMQ AMQP 对列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/SkyWalking-linkln-Lookup/">SkyWalking linkln Lookup<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/apache-ab-压力测试/">apache ab 压力测试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos-7-2-MariaDB-10-1-yum/">centos 7.2 MariaDB 10.1 yum<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos7-firewalld-iptables-防火墙/">centos7 firewalld iptables 防火墙<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/cms-gc-full-gc/">cms gc full gc<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/docker-mysql/">docker mysql<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/dubbo-rpc-面试/">dubbo rpc 面试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticSearch/">elasticSearch<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticsearch-HA-时实/">elasticsearch HA 时实<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/es-elastic-search-service/">es elastic search service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/gradle-maven-ant-new-publish-create/">gradle maven ant new publish create<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/guns-study-spring-spring-mvc-shro/">guns study spring spring mvc shro<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hadoop-hive-dataSkew/">hadoop hive dataSkew<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-bigdata/">hive bigdata<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-textfile-seqFile-RCFile-ORCFile-Parquet/">hive textfile seqFile RCFile ORCFile Parquet<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-规范-hexo/">java 规范 hexo<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-command/">linux command<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-ssh-keygen-git-免密-login/">linux ssh-keygen git 免密 login<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/logo-免密-ssh-keygen-登录-云服务器-ssh-keygen-无密码登录/">logo 免密 ssh-keygen 登录 云服务器  ssh-keygen 无密码登录<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-http/">nginx http<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openresty-tengine-ssl/">nginx openresty tengine ssl<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openretry-tengine-ngx-slab-stat/">nginx openretry tengine ngx_slab_stat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-web-config-nginx-conf/">nginx web config nginx.conf<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/presto/">presto<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/spring-jpa-data-Repository-ORM/">spring jpa data Repository ORM<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-GateWay-Zuul/">springcloud GateWay Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul/">springcloud config Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul-parallel-并发-concorrent-并行-Spring-Cloud-Bus/">springcloud config Zuul parallel(并发) concorrent(并行) Spring Cloud Bus<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-springboot-service/">springcloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-zuul-分布式模块-分布式/">springcloud zuul 分布式模块 分布式<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/todolist-work-jobs-myself/">todolist work jobs myself<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/wget-download-爬取/">wget download 爬取<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库-分表-公区-高效-海量数据/">分库 分表 公区 高效 海量数据<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/姜老师-第四天-MapReduce/">姜老师 第四天 MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/容量设计-架构-压力/">容量设计 架构 压力<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/服务注册-Consul-Eureka-confi-spring-cloud/">服务注册 Consul Eureka confi spring cloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/架构-MySQL-Master-Slave/">架构 MySQL Master Slave<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <a href="/about" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-purple">person</i>
+      <div class="mdui-list-item-content">About</div>
+    </a>
+  </div>
+
+  <div class="mdui-divider"></div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    
+      <a href="/tagcloud" class="mdui-list-item mdui-ripple">标签云</a>
+    
+      <a href="/gallery" class="mdui-list-item mdui-ripple">画廊</a>
+    
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <div class="mdui-list-item-content">Links</div>
+        <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        
+          <a href="javascript:;" class="mdui-list-item mdui-p-l-2 mdui-text-color-theme mdui-ripple" style="justify-content: center;">No Links</a>
+        
+      </div>
+    </div>
+  </div>
+</aside>
+  <main id="main" class="mdui-m-t-5 fadeIn animated">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.css">
+  <style>#main article .mdui-card-content .center-block{display:block!important;margin-right:auto!important;margin-left:auto!important}</style>
+  <article class="mdui-card mdui-m-b-5">
+    <header class="mdui-card-media">
+      <img src="/images/random/material-12.png" style="max-height: 240px;">
+      <div class="mdui-card-media-covered">
+        <div class="mdui-card-primary">
+          <div class="mdui-card-primary-title">JavaEnterprise_Architect_001</div>
+          <div class="mdui-card-primary-subtitle"><i class="iconfont">&#xe697;</i> 2020-06-14 / <i class="iconfont">&#xe601;</i> chenhj(brenda)</div>
+        </div>
+      </div>
+      <div class="mdui-card-menu">
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#qrcode', align: 'right'}"><i class="mdui-icon material-icons">devices</i></button>
+          <ul class="mdui-menu" id="qrcode">
+            
+              <li class="mdui-menu-item"><a class="mdui-text-center mdui-ripple">发送到手机</a></li>
+            
+            <li class="mdui-menu-item" disabled>
+              
+                <img src="https://chart.googleapis.com/chart?cht=qr&chs=246x246&chl=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/&chld=M|2">
+              
+            </li>
+          </ul>
+        
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="mdui-icon material-icons">share</i></button>
+          <ul class="mdui-menu" id="share_menu">
+            <li class="mdui-menu-item">
+              <a href="http://service.weibo.com/share/share.php?appkey=&title=JavaEnterprise_Architect_001&url=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/&pic=https://www.ant-loiter.com/images/favicon.png&searchPic=false&style=simple" target="_blank" class="mdui-ripple">Share to Weibo</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://twitter.com/intent/tweet?text=JavaEnterprise_Architect_001&url=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/&via=chenhj(brenda)" target="_blank" class="mdui-ripple">Share to Twitter</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/" target="_blank" class="mdui-ripple">Share to Facebook</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://plus.google.com/share?url=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/" target="_blank" class="mdui-ripple">Share to Google+</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/&title=JavaEnterprise_Architect_001" target="_blank" class="mdui-ripple">Share to LinkedIn</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="http://connect.qq.com/widget/shareqq/index.html?site=Ant-loiter个人博客&title=JavaEnterprise_Architect_001&pics=https://www.ant-loiter.com/images/favicon.png&url=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/" target="_blank" class="mdui-ripple">Share to QQ</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://telegram.me/share/url?url=https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/&text=JavaEnterprise_Architect_001" target="_blank" class="mdui-ripple">Share to Telegram</a>
+            </li>
+          </ul>
+        
+      </div>
+    </header>
+    <div class="mdui-card-content mdui-typo">
+      <h1 id="分布式事务这深入理解？"><a href="#分布式事务这深入理解？" class="headerlink" title="分布式事务这深入理解？"></a>分布式事务这深入理解？</h1><p><em>2PC、3PC及TCC协议</em></p>
+<h2 id="什么是分布式事务"><a href="#什么是分布式事务" class="headerlink" title="什么是分布式事务"></a>什么是分布式事务</h2><p>其实分布式事务从实质上看与数据库事务的概念是一致的， 既然是事务也就需要满足事务的基本特征（ACID）， 只是分布式事务相对于本地事务而言其表现形式有很大的不同， 如， 一个jvm进程中如果需要同时操作数据库的多条记录， 而这些操作需要在一个事务中，那么我们可以通过数据库的事务机制（一般的数据库锁）来实现。 </p>
+<p>而随着这个jvm进程（应用）被拆分成了微服务架构， 原本一个本地逻辑执行单元被拆分到了多个独立的微服务中， 这些微服务又分别操作不同的数据库和表， 服务之间通过网络调用。 </p>
+<p>如，服务A收到笔购物下单请求后， 需要调用服务B去支付， 支付 成功则处理购物订单为待发货状态， 否则就需要将购物订单处理为失败状态。</p>
+<p>分布式事务实现方式有很多种， 最且有代表性的是由Oracle Tuxdeo系统提出的XA分布式事务协议， XA协议包括两阶段提交（2PC）和三阶段提交（3PC）两种理实， 接下来我们分别来介绍这两种实现方工的原理。 </p>
+<h3 id="两阶段提交（2PC）"><a href="#两阶段提交（2PC）" class="headerlink" title="两阶段提交（2PC）"></a>两阶段提交（2PC）</h3><p>两阶段提交又称为2PC（two-phase commit protocol）， 2PC是一个非常经典的强一致、中心化的原子提交协议。 这里所说的中心化是指协议中有两类节点：一个是中心化的协调者节点（coordinator)和N<br>个参与者节点（Partcipant）。 </p>
+<h4 id="第一阶段：-请求、表决阶段"><a href="#第一阶段：-请求、表决阶段" class="headerlink" title="第一阶段： 请求、表决阶段"></a>第一阶段： 请求、表决阶段</h4><p>Starter(分布式事务发起者) -&gt; （1、发起请求调用）-&gt; Coordinator 协调者 init </p>
+<p>-&gt; Partcipant (参与者A) -&gt; 开启本地事务操作数据库</p>
+<p>-&gt; Partcipant (参与者B) -&gt; 开启本地事务操作数据库</p>
+<p>就是分布式事务的发起方在向分布式事务协调者（Coordinator）发送请求时， Coordinator首先会分别向参与者（Partcipant）节点A、参与这节点（Partcipant)节点B分别发送事务预处理请求，称之为Prepare, 有些资料也叫“Vote Request” 。 </p>
+<p>说的直白点就是问一下这些参与节点”这件事情你们能不能处理成功了“ ， 此时参与者节点一般来说都会打开本地数据库事务， 然后开始执行数据本地事务， 但在执行完成后并不会立马提交数据库本地事务， 而先向Coordinator报告说，我这边可以处理了、我这边不能处理。 </p>
+<p>如果所有的参与者与这个点向协调者作了”vote Commit“的反馈的话， 那么此时流程就会进入第二个阶段了。 </p>
+<h4 id="第二个阶段，-提交-执行阶段"><a href="#第二个阶段，-提交-执行阶段" class="headerlink" title="第二个阶段， 提交/执行阶段"></a>第二个阶段， 提交/执行阶段</h4><p>根据各参与者反馈的结果， 协 调者会确定是提交还是回滚操作； </p>
+<p>基于二阶段提交会存在一些问题： </p>
+<ul>
+<li><p>性能问题。 从流程上我们可以看得出， 其最大缺点就是在于穹的执行过程中间， 节点都处于阻塞状态。 各个操作数据库的节点都点用的数据库资源， 只有当所有节点准备完毕， 事务协调者才会通知进行全局提交， 参与者进行本地事务提交后才会释放资源。 这样的过程会比较漫长，对性参影响比较大。 </p>
+</li>
+<li><p>协调者单点故障问题， 事务协调者是整个XA模型的核心， 一旦事务协调者挂掉， 会导致参与者收不到提交或回滚的通知， 从而导致参与者节点绐xtlu处理事务无法完成的中间状态。 </p>
+</li>
+<li><p>丢失消息导致的数据不一致问题， 在这二个阶段， 如果发生局部网络问题， 一部分事务参考者收一了提交消息， 别一部分事务参与者没收到提交消息， 那么就会导致节点间数据的不一致问题。 </p>
+</li>
+</ul>
+<h2 id="三阶段提交（3PC）"><a href="#三阶段提交（3PC）" class="headerlink" title="三阶段提交（3PC）"></a>三阶段提交（3PC）</h2><h2 id="补偿事务（TCC）"><a href="#补偿事务（TCC）" class="headerlink" title="补偿事务（TCC）"></a>补偿事务（TCC）</h2><p>TCC（Try-Confirm-Cancel） 又称补偿事务。 其核心思想是： ”针对每一个操作都要注册一个与其对应的确认和补偿（撤销操作）“ 它分为三个操作；</p>
+<ul>
+<li><p>Try阶段： 主要是对业务系统做检测与资源预留</p>
+</li>
+<li><p>Confirm阶段： 确认执行业务操作</p>
+</li>
+<li><p>Cancel阶段： 取消执行业务操作； </p>
+</li>
+</ul>
+<h2 id="Redis实际，使用场景"><a href="#Redis实际，使用场景" class="headerlink" title="Redis实际，使用场景"></a>Redis实际，使用场景</h2><ul>
+<li><p>Cache Aside </p>
+</li>
+<li><p>Read/Write Through</p>
+</li>
+</ul>
+<p>对应的流程图为：<br><img src="https://www.ant-loiter.com/img/redis-cache-strage.png" alt="Redis Cache strategy"></p>
+<p>实战：</p>
+<ul>
+<li><p>数据加版本号， 写库时自动增一。 更新缓存时， 只允许高版本覆盖低版本的数据。 </p>
+</li>
+<li><p>对于Cache Aside 和 Read/Write Through而带来的数据不一致问题， 工作中是这样解决：</p>
+<ul>
+<li>a 写线程； b 读线程； </li>
+<li>b 线程， 读缓存 -&gt; 未命中 -&gt; 上写锁 -&gt; 从db读数据到缓存 -&gt; 释放锁； </li>
+<li>a 线程， 上写锁 -&gt; 写DB -&gt; 删除缓存/ 改缓存 -&gt; 释放锁；<br>这样来保证a，b线程并发读写缓存带来的脏数据问题。 </li>
+</ul>
+</li>
+</ul>
+
+      
+      <blockquote>
+        
+        <strong>PermaLink: </strong><br><a href="https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/">https://www.ant-loiter.com/2020/06/14/JavaEnterprise-Architect-001/</a>
+      </blockquote>
+    </div>
+    <footer class="mdui-card-actions">
+      
+        <a class="mdui-ripple article_categories-link" href="/categories/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info</a>
+      
+      
+        <a class="mdui-ripple article_tags-link" href="/tags/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info</a>
+      
+    </footer>
+    
+  </article>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+  <script>$("#main article .mdui-card-content img.fancybox").on("click",function(e){$.fancybox.open({src:$(this).attr("src")});});</script>
+
+
+  <nav id="paginator">
+    
+      <a rel="prev" class="extend prev" href="/2020/06/16/Redis-distributed-Lock/">
+        <button aria-label="prev" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_back</i></button>
+        <span class="mdui-p-x-3" mdui-tooltip="{content: 'Redis-distributed-Lock'}">Prev</span>
+      </a>
+    
+    <div class="spacer"></div>
+    
+      <a rel="next" class="extend next" href="/2020/06/12/JavaEnterprise-Architect/">
+        <span class="mdui-p-x-3" mdui-tooltip="{content: 'JavaEnterprise_Architect'}">Next</span>
+        <button aria-label="next" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_forward</i></button>
+      </a>
+    
+  </nav>
+
+
+
+</main>
+  <footer id="footer" class="mdui-m-t-5 mdui-p-y-3 mdui-color-theme">
+  <div class="mdui-p-y-0 mdui-text-center">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </div>
+  <div class="mdui-p-y-1 mdui-text-center">
+    Copyright &copy; 2020 chenhj(brenda)<br>
+    Powered by <a href="https://hexo.io/" target="_blank" class="mdui-text-color-theme-accent">Hexo</a>
+    
+  </div>
+</footer>
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_upward</i></button>
+  
+  <script src="/js/mdui.js"></script>
+<script src="/js/script.js"></script>
+  <script src="/custom.js"></script>
+</body>
+</html>

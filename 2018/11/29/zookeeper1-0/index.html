@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="renderer" content="webkit">
+
+  
+  <title>zookeeper特性学习一 | Ant-loiter个人博客</title>
+
+  <link rel="shortcut icon" href="/images/favicon.png">
+  <link rel="alternate" href="/atom.xml" title="Ant-loiter个人博客">
+  <meta name="description" content="zookeeper 的特性 一致性： 数据一致性， 数据按照顺序分批入库；   原子性： 事务要么成功要么失败， 不会局部化；   单一视图： 客户端连接集群中的任一zk节点， 数据都是一致的；   可靠性： 每次对zk的操作状态都会保存在服务端；   实时性： 客户端可以读取到zk服务端的最新数据； 如果有数据更新，一会会在秒内完成更新；    以上是zk的五个特性； 非常适合做分布式的管理；">
+<meta name="keywords" content="zookeeper 分布式 注册 管理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="zookeeper特性学习一">
+<meta property="og:url" content="https://www.ant-loiter.com/2018/11/29/zookeeper1-0/index.html">
+<meta property="og:site_name" content="Ant-loiter个人博客">
+<meta property="og:description" content="zookeeper 的特性 一致性： 数据一致性， 数据按照顺序分批入库；   原子性： 事务要么成功要么失败， 不会局部化；   单一视图： 客户端连接集群中的任一zk节点， 数据都是一致的；   可靠性： 每次对zk的操作状态都会保存在服务端；   实时性： 客户端可以读取到zk服务端的最新数据； 如果有数据更新，一会会在秒内完成更新；    以上是zk的五个特性； 非常适合做分布式的管理；">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:updated_time" content="2020-10-30T13:49:33.121Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="zookeeper特性学习一">
+<meta name="twitter:description" content="zookeeper 的特性 一致性： 数据一致性， 数据按照顺序分批入库；   原子性： 事务要么成功要么失败， 不会局部化；   单一视图： 客户端连接集群中的任一zk节点， 数据都是一致的；   可靠性： 每次对zk的操作状态都会保存在服务端；   实时性： 客户端可以读取到zk服务端的最新数据； 如果有数据更新，一会会在秒内完成更新；    以上是zk的五个特性； 非常适合做分布式的管理；">
+
+  <meta name="keywords" content=",zookeeper 分布式 注册 管理">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="theme-color" content="#9C27B0">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Ant-loiter个人博客">
+  <meta name="msapplication-starturl" content="https://www.ant-loiter.com/2018/11/29/zookeeper1-0/">
+  <meta name="msapplication-navbutton-color" content="#9C27B0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ant-loiter个人博客">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
+
+  
+    <link rel="canonical" href="https://www.ant-loiter.com/2018/11/29/zookeeper1-0/">
+  
+
+  
+  
+
+  
+  
+  
+
+  <link rel="stylesheet" href="/css/mdui.css">
+<link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/custom.css">
+</head>
+<body class="mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+  <script>var a=localStorage.getItem("mdui-theme-layout-dark");if(a){document.getElementsByTagName("body")[0].className+=" mdui-theme-layout-dark"};</script>
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(!a){document.getElementsByTagName("body")[0].className+=" mdui-drawer-body-left"};</script>
+  <header id="header" class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-appbar-inset">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="mdui-icon material-icons">menu</i></a>
+    <a href="/" class="mdui-typo-headline">Ant-loiter个人博客</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-dialog="{target: '#search'}" mdui-tooltip="{content: 'Search'}"><i class="mdui-icon material-icons">search</i></a>
+    <a href="/atom.xml" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'RSS'}"><i class="mdui-icon material-icons">rss_feed</i></a>
+  </div>
+</header>
+<div class="mdui-dialog" id="search">
+  
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="请输入关键字"><input type="hidden" name="sitesearch" value="https://www.ant-loiter.com"></form>
+    <div class="search-result"></div>
+  
+</div>
+  <aside id="sidebar" class="mdui-drawer mdui-drawer-full-height">
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(a){document.getElementById("sidebar").className+=" mdui-drawer-close"};</script>
+  <div class="mdui-grid-tile">
+    <img src="/images/banner.png" style="height: 160px;">
+    <img src="/images/avatar.png" class="avatar-animation" style="position: absolute; top: 10%; left: 24px; width: 64px; height: 64px; border: 2px solid #fff; border-radius: 50%;">
+    <div class="mdui-grid-tile-actions">
+      <div class="mdui-grid-tile-text">
+        <div class="mdui-grid-tile-title">chenhj(brenda)</div>
+        <div class="mdui-grid-tile-subtitle"><i class="mdui-icon material-icons">art_track</i>www.ant-loiter.com</div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    <a href="/" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-blue">home</i>
+      <div class="mdui-list-item-content">Home</div>
+    </a>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-deep-orange">archive</i>
+        <div class="mdui-list-item-content">Archive</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/archives/2020/08/">八月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="mdui-ripple sidebar_archives-count">7</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/07/">七月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/06/">六月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/05/">五月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/04/">四月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/03/">三月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/02/">二月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/01/">一月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/12/">十二月 2018<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="mdui-ripple sidebar_archives-count">21</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/10/">十月 2018<span class="mdui-ripple sidebar_archives-count">8</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="mdui-ripple sidebar_archives-count">6</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-green">class</i>
+        <div class="mdui-list-item-content">Category</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/categories/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/MySQL-config/">MySQL config<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RabbitMQ-MQ-消息队列/">RabbitMQ MQ 消息队列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/apache-压力测试工具/">apache 压力测试工具<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/centos7防火墙-firewalld/">centos7防火墙 firewalld<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/cms-jvm-gc-Throught-Serial/">cms jvm gc Throught Serial<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/docker-mysql-pull/">docker mysql pull<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/elasticSearch-es/">elasticSearch es<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/spring-cloud-springboot-service/">spring cloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/微服务网关路由-GateWay/">微服务网关路由 GateWay<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/服务注册-Consul-Eureka-confi-SpringCloud/">服务注册 Consul Eureka confi SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构-MySQL/">架构 MySQL<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构性能分析/">架构性能分析<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-brown">bookmark</i>
+        <div class="mdui-list-item-content">Tag</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/tags/BigData-Spark-MapReduce/">BigData Spark MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ES-TS-JS/">ES TS JS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Egg-Alibaba-Node-js-Koa/">Egg Alibaba Node.js Koa<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/HBase-zookeeper-BigData/">HBase zookeeper BigData<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Linux-Centos-Nginx-Let’Encrypt-ssl-TLS/">Linux Centos Nginx Let’Encrypt ssl TLS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/MySQL-config-my-conf-案例/">MySQL config my.conf 案例<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Nginx-content-static-auto-index-index-random-index-concat/">Nginx content static auto_index index random_index concat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/PM-liangning-得到/">PM liangning 得到<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RabbitMQ-AMQP-对列/">RabbitMQ AMQP 对列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/SkyWalking-linkln-Lookup/">SkyWalking linkln Lookup<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/apache-ab-压力测试/">apache ab 压力测试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos-7-2-MariaDB-10-1-yum/">centos 7.2 MariaDB 10.1 yum<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos7-firewalld-iptables-防火墙/">centos7 firewalld iptables 防火墙<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/cms-gc-full-gc/">cms gc full gc<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/docker-mysql/">docker mysql<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/dubbo-rpc-面试/">dubbo rpc 面试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticSearch/">elasticSearch<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticsearch-HA-时实/">elasticsearch HA 时实<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/es-elastic-search-service/">es elastic search service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/gradle-maven-ant-new-publish-create/">gradle maven ant new publish create<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/guns-study-spring-spring-mvc-shro/">guns study spring spring mvc shro<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hadoop-hive-dataSkew/">hadoop hive dataSkew<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-bigdata/">hive bigdata<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-textfile-seqFile-RCFile-ORCFile-Parquet/">hive textfile seqFile RCFile ORCFile Parquet<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-规范-hexo/">java 规范 hexo<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-command/">linux command<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-ssh-keygen-git-免密-login/">linux ssh-keygen git 免密 login<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/logo-免密-ssh-keygen-登录-云服务器-ssh-keygen-无密码登录/">logo 免密 ssh-keygen 登录 云服务器  ssh-keygen 无密码登录<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-http/">nginx http<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openresty-tengine-ssl/">nginx openresty tengine ssl<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openretry-tengine-ngx-slab-stat/">nginx openretry tengine ngx_slab_stat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-web-config-nginx-conf/">nginx web config nginx.conf<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/presto/">presto<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/spring-jpa-data-Repository-ORM/">spring jpa data Repository ORM<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-GateWay-Zuul/">springcloud GateWay Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul/">springcloud config Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul-parallel-并发-concorrent-并行-Spring-Cloud-Bus/">springcloud config Zuul parallel(并发) concorrent(并行) Spring Cloud Bus<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-springboot-service/">springcloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-zuul-分布式模块-分布式/">springcloud zuul 分布式模块 分布式<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/todolist-work-jobs-myself/">todolist work jobs myself<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/wget-download-爬取/">wget download 爬取<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库-分表-公区-高效-海量数据/">分库 分表 公区 高效 海量数据<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/姜老师-第四天-MapReduce/">姜老师 第四天 MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/容量设计-架构-压力/">容量设计 架构 压力<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/服务注册-Consul-Eureka-confi-spring-cloud/">服务注册 Consul Eureka confi spring cloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/架构-MySQL-Master-Slave/">架构 MySQL Master Slave<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <a href="/about" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-purple">person</i>
+      <div class="mdui-list-item-content">About</div>
+    </a>
+  </div>
+
+  <div class="mdui-divider"></div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    
+      <a href="/tagcloud" class="mdui-list-item mdui-ripple">标签云</a>
+    
+      <a href="/gallery" class="mdui-list-item mdui-ripple">画廊</a>
+    
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <div class="mdui-list-item-content">Links</div>
+        <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        
+          <a href="javascript:;" class="mdui-list-item mdui-p-l-2 mdui-text-color-theme mdui-ripple" style="justify-content: center;">No Links</a>
+        
+      </div>
+    </div>
+  </div>
+</aside>
+  <main id="main" class="mdui-m-t-5 fadeIn animated">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.css">
+  <style>#main article .mdui-card-content .center-block{display:block!important;margin-right:auto!important;margin-left:auto!important}</style>
+  <article class="mdui-card mdui-m-b-5">
+    <header class="mdui-card-media">
+      <img src="/images/random/material-15.png" style="max-height: 240px;">
+      <div class="mdui-card-media-covered">
+        <div class="mdui-card-primary">
+          <div class="mdui-card-primary-title">zookeeper特性学习一</div>
+          <div class="mdui-card-primary-subtitle"><i class="iconfont">&#xe697;</i> 2018-11-29 / <i class="iconfont">&#xe601;</i> chenhj(brenda)</div>
+        </div>
+      </div>
+      <div class="mdui-card-menu">
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#qrcode', align: 'right'}"><i class="mdui-icon material-icons">devices</i></button>
+          <ul class="mdui-menu" id="qrcode">
+            
+              <li class="mdui-menu-item"><a class="mdui-text-center mdui-ripple">发送到手机</a></li>
+            
+            <li class="mdui-menu-item" disabled>
+              
+                <img src="https://chart.googleapis.com/chart?cht=qr&chs=246x246&chl=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/&chld=M|2">
+              
+            </li>
+          </ul>
+        
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="mdui-icon material-icons">share</i></button>
+          <ul class="mdui-menu" id="share_menu">
+            <li class="mdui-menu-item">
+              <a href="http://service.weibo.com/share/share.php?appkey=&title=zookeeper特性学习一&url=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/&pic=https://www.ant-loiter.com/images/favicon.png&searchPic=false&style=simple" target="_blank" class="mdui-ripple">Share to Weibo</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://twitter.com/intent/tweet?text=zookeeper特性学习一&url=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/&via=chenhj(brenda)" target="_blank" class="mdui-ripple">Share to Twitter</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/" target="_blank" class="mdui-ripple">Share to Facebook</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://plus.google.com/share?url=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/" target="_blank" class="mdui-ripple">Share to Google+</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/&title=zookeeper特性学习一" target="_blank" class="mdui-ripple">Share to LinkedIn</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="http://connect.qq.com/widget/shareqq/index.html?site=Ant-loiter个人博客&title=zookeeper特性学习一&pics=https://www.ant-loiter.com/images/favicon.png&url=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/" target="_blank" class="mdui-ripple">Share to QQ</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://telegram.me/share/url?url=https://www.ant-loiter.com/2018/11/29/zookeeper1-0/&text=zookeeper特性学习一" target="_blank" class="mdui-ripple">Share to Telegram</a>
+            </li>
+          </ul>
+        
+      </div>
+    </header>
+    <div class="mdui-card-content mdui-typo">
+      <h1 id="zookeeper-的特性"><a href="#zookeeper-的特性" class="headerlink" title="zookeeper 的特性"></a>zookeeper 的特性</h1><ul>
+<li><p>一致性： 数据一致性， 数据按照顺序分批入库； </p>
+</li>
+<li><p>原子性： 事务要么成功要么失败， 不会局部化； </p>
+</li>
+<li><p>单一视图： 客户端连接集群中的任一zk节点， 数据都是一致的； </p>
+</li>
+<li><p>可靠性： 每次对zk的操作状态都会保存在服务端； </p>
+</li>
+<li><p>实时性： 客户端可以读取到zk服务端的最新数据； 如果有数据更新，一会会在秒内完成更新； </p>
+</li>
+</ul>
+<p>以上是zk的五个特性； 非常适合做分布式的管理； </p>
+<h1 id="zoo-cfg-配置"><a href="#zoo-cfg-配置" class="headerlink" title="zoo.cfg 配置"></a>zoo.cfg 配置</h1><ul>
+<li><p>tickTime: 用于计算的时间单元。 比如session超时： N * tickTime; </p>
+</li>
+<li><p>initLimit: 用于集群， 允许从节点连接并同步到master节点的初始化连接时间， 以tickTime的倍数来表示；</p>
+</li>
+<li><p>syncLimit: 用于集群， master主节点与从节点之间发送消息， 请求和应答时间长度。（心跳机制）</p>
+</li>
+<li><p>dataDir: 必须配置， 用来存放zookeeper时产生的临时文件； </p>
+</li>
+<li><p>dataLogDir: 日志目录， 如果没有配置会和dataDir分用一个目录 ； </p>
+</li>
+<li><p>clientPort: 连接服务器的端口，默认为， 2181； </p>
+</li>
+</ul>
+<h1 id="zookeeper基本数据模型介绍一"><a href="#zookeeper基本数据模型介绍一" class="headerlink" title="zookeeper基本数据模型介绍一"></a>zookeeper基本数据模型介绍一</h1><ul>
+<li><p>是一个树形结构， 类似于前端开发中的tree.js组件； </p>
+</li>
+<li><p>zk的数据模型也可以理解为linux/unix的文件目录： /usr/local/…</p>
+</li>
+<li><p>每一个节点都称之为znode， 它可以有子节点， 也可以有数据； </p>
+</li>
+<li><p>每个节点分为临时节点和永久节点， 临时节点在客户端断开后消失；</p>
+</li>
+<li><p>每个zk节点都有各自的版本号， 可以通过命令行来显示节点信息； 在每个zk节点信息里都有一个版本号信息； </p>
+</li>
+<li><p>每当节点数据发生变化， 那么该点节的版本号会累加（乐观销机制），在更新节点之前先拿到节点信息，里面有版本号， 提交更新时，要比对版本号信息；如果不对就不提交更新； </p>
+</li>
+<li><p>删除/修改过时节点， 版本号不匹配则会报错； </p>
+</li>
+<li><p>每个zk节点存储的数据不宜过大， 几K即可。 </p>
+</li>
+<li><p>节点可以设置权限acl ， 可以通过权限来限制用户的访问； </p>
+</li>
+</ul>
+<h1 id="zk-客户端如何连接？"><a href="#zk-客户端如何连接？" class="headerlink" title="zk 客户端如何连接？"></a>zk 客户端如何连接？</h1><p>在zk的安装目录下，/bin目录下有个zkcli.sh就是用来连接zkServer服务的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; zkCli.sh </span><br><span class="line">会显示如下信息，表示连接成功， </span><br><span class="line"></span><br><span class="line">[zk: localhost:2181(CONNECTED) 0 ]</span><br></pre></td></tr></table></figure>
+<p>进去后，输入help可以查看zkCli的所有命令：  help; </p>
+<h2 id="zk的作用体现一"><a href="#zk的作用体现一" class="headerlink" title="zk的作用体现一"></a>zk的作用体现一</h2><blockquote>
+<ul>
+<li>master 节点选举， 主节点挂了以后， 从节点就会接手工作， 并且保证这个节点是唯一的， 这也是所谓首脑模式， 从而保证了我们的集群是高可用的；</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>统一配置文件管理， 即只需要部署一台服务器， 则可以把相同的配置文件同步更新到其他的服务器， 此操作在云计算中用的特别多（假设修改了redis统一配置）；</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>发布与订阅， 类似消息队列MQ（amq， rmq…），dubbo发布者把数据存在znode上， 订阅者会读取这个数据；</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>提供了分布锁， 分布锁环境中不同进程争夺资源， 类似于多线程中的锁； </li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>集群管理， 集群中保证数据的强一致性； </li>
+</ul>
+</blockquote>
+<h2 id="zkCli-sh命令使用"><a href="#zkCli-sh命令使用" class="headerlink" title="zkCli.sh命令使用"></a>zkCli.sh命令使用</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">进入shell命令行，输入</span><br><span class="line">./bin/zkCli.sh</span><br><span class="line"></span><br><span class="line">注：回二次车，可以进入client的交互窗口；</span><br><span class="line"></span><br><span class="line">help 查看支持的命令信息；</span><br></pre></td></tr></table></figure>
+<h3 id="ls-与-ls2-命令的区别"><a href="#ls-与-ls2-命令的区别" class="headerlink" title="ls 与 ls2 命令的区别"></a>ls 与 ls2 命令的区别</h3><p>ls命令只是查看节点的名，ls2不但可以查看节点名还可以显示出当前节点的详细信息； 他其实就是把ls和stat二个命令结合了； </p>
+<h3 id="get-命令"><a href="#get-命令" class="headerlink" title="get 命令"></a>get 命令</h3><p>就是可以把指定节点下的信息读出； 如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get /</span><br></pre></td></tr></table></figure>
+<h3 id="create-s-e-path-data-acl"><a href="#create-s-e-path-data-acl" class="headerlink" title="create [-s] [-e] path data acl"></a>create [-s] [-e] path data acl</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">create /imooc imooc-data-info</span><br><span class="line">这样就创建了一个节点imooc,里面的数据是imooc-data-info,通过上面的命令创建出来的节点就是一个持久化的节点； </span><br><span class="line"></span><br><span class="line">create -e /imooc/tmp imooc-temp</span><br><span class="line"></span><br><span class="line">这个命令就是创建了一个临时节点； </span><br><span class="line">cversion = -1</span><br><span class="line">dataVersion = 0</span><br><span class="line">aclVersion = 0</span><br><span class="line">ephemeralOwner = 0x0 // 表示持久化节点</span><br><span class="line">dataLength = 0</span><br><span class="line">numChildren = 1</span><br><span class="line"></span><br><span class="line">---------</span><br><span class="line">pZxid = 0xd</span><br><span class="line">cversion = 0</span><br><span class="line">dataVersion = 0</span><br><span class="line">aclVersion = 0</span><br><span class="line">ephemeralOwner = 0x100003128270005 //表示临时节点</span><br><span class="line">dataLength = 10</span><br><span class="line">numChildren = 0</span><br><span class="line"></span><br><span class="line">create -s /imooc/sec seqinfo</span><br><span class="line">这个命令可以创建出一个序列式的节点， 节点的名称是一个序列，步长为1的自增序列</span><br></pre></td></tr></table></figure>
+<p>注意， 创建的临时节点，当当前这个zknoke心跳没有的话， 那么这个zknode节点就会被丢失，这时所有的临时节点就会被删除掉； </p>
+<h2 id="zk-特性-watchet机制-一"><a href="#zk-特性-watchet机制-一" class="headerlink" title="zk 特性 -  watchet机制 一"></a>zk 特性 -  watchet机制 一</h2><blockquote>
+<ul>
+<li>针对每个节点的操作， 都会有一个监督者 （ watcher)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>如， 当监控的某个对象（znode)发生变化了， 则触发watcher事件； </li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>注意： zk中的watcher是一次生的， 触发后立即销毁掉； （是针对每一个节点都有一个各自的wacher)</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>父子节点进行 CRUD时都会触发其watcher功能； </li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>针对不同类型的操作， 触发的watcher事件也不同：</li>
+</ul>
+</blockquote>
+<ul>
+<li><p>（子）节点创建事件</p>
+</li>
+<li><p>（子）节点删除事件</p>
+</li>
+<li><p>（子）节点数据变化事件</p>
+</li>
+</ul>
+<p>都会有相对应的watcher事件与之对应； 操作；</p>
+<p>可以把watcher理解成为一个trigger即可。 </p>
+<h2 id="Watcher-命令行操作"><a href="#Watcher-命令行操作" class="headerlink" title="Watcher 命令行操作"></a>Watcher 命令行操作</h2><blockquote>
+<ul>
+<li>通过 get path [watch] 设置watcher </li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>父节点增删改操作触发watcher 进行。 </li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>子节点增删改操作触发watcher 进行。 </li>
+</ul>
+</blockquote>
+<h2 id="Watcher事件类型-之一"><a href="#Watcher事件类型-之一" class="headerlink" title="Watcher事件类型 之一"></a>Watcher事件类型 之一</h2><blockquote>
+<ul>
+<li>创建父节点触发： NodeCreated  </li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">stat /imooc watch  </span><br><span class="line">表示为/imooc节点添加watch事件， 注意， 如果/imooc这个节点没有也没关系， 这个节点的/imooc的watch节点还是存在的。 </span><br><span class="line"></span><br><span class="line">create /imooc imoocinfo</span><br><span class="line"></span><br><span class="line">执行上面的命令后， 会自动触发watch事件， 事件名叫做NodeCreated</span><br><span class="line"></span><br><span class="line">实验操作</span><br><span class="line"></span><br><span class="line">WATCHER::</span><br><span class="line"></span><br><span class="line">WatchedEvent state:SyncConnected type:NodeCreated path:/zk001</span><br><span class="line">Created /zk001</span><br></pre></td></tr></table></figure>
+<p>针对一个节点如果有CRUD的相关操作，想有watcher的事件发生， 就需要事件对这个事情添加上watcher事件， 否则是不会有watcher事件的发生； </p>
+<p>有一个要注意的地方， 就是可以对父节点添加watcher事件， 这个对其子节点进行增加和删除操作时会触发NodeChildChanged事件； 修改是不是会触发的。 为什么呢。 修改某个节点的内容时其实是不会改变tree的结构所以不会鉵发相应的父节点对应的事件； </p>
+<p>由些可以推出，某个子节点的更新watcher事件， 是需要对某个子节点单独添加的。 </p>
+<p>get /imooc/abc watch 这个就可以给这个节点添加一个watcher事件，<br>set /imooc/abc xyz 这个命令执行时， 就会触发一个watcher事件； </p>
+<h2 id="ACL-命令行"><a href="#ACL-命令行" class="headerlink" title="ACL 命令行"></a>ACL 命令行</h2><blockquote>
+<ul>
+<li>getACL 获取某个节点acl的权限信息</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>setAcl 设置某个节点的acl权限；</li>
+</ul>
+</blockquote>
+<blockquote>
+<ul>
+<li>addauth 输入认证授权信息， 注册时输入明文密码（登录 ） 但是在zk系统 里在密码会以加密形式存在。<br>注意： 只有通过addauth命令创建的用户，才可以登录后zk系统 ； </li>
+</ul>
+</blockquote>
+<h2 id="ACL-的构成"><a href="#ACL-的构成" class="headerlink" title="ACL 的构成"></a>ACL 的构成</h2><blockquote>
+<ul>
+<li>zk的acl通过[scheme:id:permissions]来构成权限列表</li>
+</ul>
+</blockquote>
+<ul>
+<li>scheme : 代表采用的某种权限机制</li>
+<li>id: 代表允许访问的用户</li>
+<li>permissions 权限组合字符串</li>
+</ul>
+<h2 id="acl的构成-scheme"><a href="#acl的构成-scheme" class="headerlink" title="acl的构成   scheme"></a>acl的构成   scheme</h2><ul>
+<li><p>world  world下只有一个id， 即只有一个用户， 也就是anyone， 那么组合的写法就是world：anyone:[permission]</p>
+</li>
+<li><p>auth： 代表认证登录， 需要注册用户有权限就可以， 形式为auth:user:password:[permissions]</p>
+</li>
+<li><p>digest 需要对密码加密才能访问， 组合形式为 disest:username:BASE64(SHA1(password)):[permissions]</p>
+</li>
+<li><p>ip: 当设置为ip指定的IP地址， 此时限制ip进行访问， 比如 ip:192.179.12.23:[permissions]</p>
+</li>
+<li><p>super 代表超级管理员， 拥有所有的权限； </p>
+</li>
+</ul>
+<h2 id="acl权限中permissions的构成"><a href="#acl权限中permissions的构成" class="headerlink" title="acl权限中permissions的构成"></a>acl权限中permissions的构成</h2><ul>
+<li><p>create 创建子节点</p>
+</li>
+<li><p>read 获取节点、子节点</p>
+</li>
+<li><p>write 设置节点数据</p>
+</li>
+<li><p>delete 删除子节点</p>
+</li>
+<li><p>admin </p>
+</li>
+</ul>
+<p>缩写就是这样的一个字符串， crwda  取每个权限单词的首字母； </p>
+<h2 id="acl-命令操作"><a href="#acl-命令操作" class="headerlink" title="acl 命令操作"></a>acl 命令操作</h2><ul>
+<li><p>world:anyone:cdrwa</p>
+</li>
+<li><p>auth:user:pwd:cdrwa</p>
+</li>
+<li><p>digest:user:BASE64(SHA1(pwd)):cdrwa</p>
+</li>
+<li><p>addauth digest user:pwd</p>
+</li>
+<li><p>ip: 192.179.23.3:cdrwa</p>
+</li>
+</ul>
+<h2 id="Acl-命令操作里关于Super-的操作"><a href="#Acl-命令操作里关于Super-的操作" class="headerlink" title="Acl 命令操作里关于Super 的操作"></a>Acl 命令操作里关于Super 的操作</h2><ul>
+<li><p>修改zkServer.sh  增加super管理员； </p>
+</li>
+<li><p>修改后必须 要重启zk  ./bin/zkServer.sh restart </p>
+</li>
+</ul>
+<p>配置超级管理员需要配置如下信息：</p>
+<p>-Dzookeeper.DigestAuthenticationProvider.superDigest=username:BASE64(sha1(passwd)) </p>
+<h2 id="zk-四字命令-（Four-Letter-Words"><a href="#zk-四字命令-（Four-Letter-Words" class="headerlink" title="zk 四字命令 （Four Letter Words)"></a>zk 四字命令 （Four Letter Words)</h2><ul>
+<li><p>zk 可以通过它自身提供的简写命令来和服务器进行交互 </p>
+</li>
+<li><p>需要使用nc命令， 安装： yum install nc </p>
+</li>
+<li><p>echo [commond] | nc [ip] [port]</p>
+</li>
+</ul>
+<p>如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">echo conf | nc 192.168.1.231 2181</span><br><span class="line">echo stat | nc 192.168.1.231 2181</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
+<p>stat 查看zk的状态信息， 以及是否mode</p>
+<p>ruok 查看当前zkserver是否启动， 返回 imok</p>
+<p>dump 列出末经处理的会话和临时节点</p>
+<p>dump 列出末经处理的会话和临时节点</p>
+<p>conf 查看服务器相关的配置信息</p>
+<p>cons 展示连接到服务器的客户端信息 </p>
+<p>envi 环境变量 </p>
+<p>mntr 是监控zk的健康信息 </p>
+<p>echo mntr | nc localhost 2181<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost zookeeper]# echo mntr | nc localhost 2181</span><br><span class="line">zk_version      3.4.13-2d71af4dbe22557fda74f9a9b4309b15a7487f03, built on 06/29/2018 04:05 GMT</span><br><span class="line">zk_avg_latency  0</span><br><span class="line">zk_max_latency  61</span><br><span class="line">zk_min_latency  0</span><br><span class="line">zk_packets_received     560</span><br><span class="line">zk_packets_sent 559</span><br><span class="line">zk_num_alive_connections        2</span><br><span class="line">zk_outstanding_requests 0</span><br><span class="line">zk_server_state standalone</span><br><span class="line">zk_znode_count  11</span><br><span class="line">zk_watch_count  0</span><br><span class="line">zk_ephemerals_count     0</span><br><span class="line">zk_approximate_data_size        158</span><br><span class="line">zk_open_file_descriptor_count   25</span><br><span class="line">zk_max_file_descriptor_count    4096</span><br><span class="line">zk_fsync_threshold_exceed_count 0</span><br></pre></td></tr></table></figure></p>
+<p>wchs 展示watch的相关信息</p>
+<p>echo wchs | nc localhost 2181 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost zookeeper]# echo wchs | nc localhost 2181</span><br><span class="line">0 connections watching 0 paths</span><br><span class="line">Total watches:0</span><br></pre></td></tr></table></figure>
+<p>注意， 在zookeeper中默认不是所有的四字命令都可以使用的。 需要配置命令的白名单或配置成通配符； </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">vim ./conf/zoo.cfg</span><br><span class="line"></span><br><span class="line">4lw.commands.whilelist=* 或 指定命令名称； </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">4lw.commands.whilelist=*</span><br><span class="line"></span><br><span class="line">配置完成后， 需要重启 </span><br><span class="line">./zkServer.sh restart</span><br></pre></td></tr></table></figure>
+<p>wchc | wchp 展示session与watch及path与watch信息； </p>
+
+      
+      <blockquote>
+        
+        <strong>PermaLink: </strong><br><a href="https://www.ant-loiter.com/2018/11/29/zookeeper1-0/">https://www.ant-loiter.com/2018/11/29/zookeeper1-0/</a>
+      </blockquote>
+    </div>
+    <footer class="mdui-card-actions">
+      
+        <a class="mdui-ripple article_categories-link" href="/categories/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理</a>
+      
+      
+        <a class="mdui-ripple article_tags-link" href="/tags/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理</a>
+      
+    </footer>
+    
+  </article>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+  <script>$("#main article .mdui-card-content img.fancybox").on("click",function(e){$.fancybox.open({src:$(this).attr("src")});});</script>
+
+
+  <nav id="paginator">
+    
+      <a rel="prev" class="extend prev" href="/2018/11/30/zookeeper特性学习二/">
+        <button aria-label="prev" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_back</i></button>
+        <span class="mdui-p-x-3" mdui-tooltip="{content: 'zookeeper特性学习二'}">Prev</span>
+      </a>
+    
+    <div class="spacer"></div>
+    
+      <a rel="next" class="extend next" href="/2018/11/29/work-todo-list/">
+        <span class="mdui-p-x-3" mdui-tooltip="{content: '工作任务队列，myself'}">Next</span>
+        <button aria-label="next" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_forward</i></button>
+      </a>
+    
+  </nav>
+
+
+
+</main>
+  <footer id="footer" class="mdui-m-t-5 mdui-p-y-3 mdui-color-theme">
+  <div class="mdui-p-y-0 mdui-text-center">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </div>
+  <div class="mdui-p-y-1 mdui-text-center">
+    Copyright &copy; 2020 chenhj(brenda)<br>
+    Powered by <a href="https://hexo.io/" target="_blank" class="mdui-text-color-theme-accent">Hexo</a>
+    
+  </div>
+</footer>
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_upward</i></button>
+  
+  <script src="/js/mdui.js"></script>
+<script src="/js/script.js"></script>
+  <script src="/custom.js"></script>
+</body>
+</html>

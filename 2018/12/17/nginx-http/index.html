@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="renderer" content="webkit">
+
+  
+  <title>nginx-http_nginx中http模块整理 | Ant-loiter个人博客</title>
+
+  <link rel="shortcut icon" href="/images/favicon.png">
+  <link rel="alternate" href="/atom.xml" title="Ant-loiter个人博客">
+  <meta name="description" content="ngx_http_referer_module是一个防盗链处理的模块；  listen指定配置12345678listen unix:/var/run/nginx.sock;listen 127.0.0.1:8000;listen 127.0.0.1;listen 8000;listen *:8000;listen localhost:8000 bind;listen [::]:8000 ipv6">
+<meta name="keywords" content="nginx http">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx-http_nginx中http模块整理">
+<meta property="og:url" content="https://www.ant-loiter.com/2018/12/17/nginx-http/index.html">
+<meta property="og:site_name" content="Ant-loiter个人博客">
+<meta property="og:description" content="ngx_http_referer_module是一个防盗链处理的模块；  listen指定配置12345678listen unix:/var/run/nginx.sock;listen 127.0.0.1:8000;listen 127.0.0.1;listen 8000;listen *:8000;listen localhost:8000 bind;listen [::]:8000 ipv6">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:updated_time" content="2020-10-30T13:49:33.120Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="nginx-http_nginx中http模块整理">
+<meta name="twitter:description" content="ngx_http_referer_module是一个防盗链处理的模块；  listen指定配置12345678listen unix:/var/run/nginx.sock;listen 127.0.0.1:8000;listen 127.0.0.1;listen 8000;listen *:8000;listen localhost:8000 bind;listen [::]:8000 ipv6">
+
+  <meta name="keywords" content=",nginx http">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="theme-color" content="#9C27B0">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Ant-loiter个人博客">
+  <meta name="msapplication-starturl" content="https://www.ant-loiter.com/2018/12/17/nginx-http/">
+  <meta name="msapplication-navbutton-color" content="#9C27B0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ant-loiter个人博客">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
+
+  
+    <link rel="canonical" href="https://www.ant-loiter.com/2018/12/17/nginx-http/">
+  
+
+  
+  
+
+  
+  
+  
+
+  <link rel="stylesheet" href="/css/mdui.css">
+<link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/custom.css">
+</head>
+<body class="mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+  <script>var a=localStorage.getItem("mdui-theme-layout-dark");if(a){document.getElementsByTagName("body")[0].className+=" mdui-theme-layout-dark"};</script>
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(!a){document.getElementsByTagName("body")[0].className+=" mdui-drawer-body-left"};</script>
+  <header id="header" class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-appbar-inset">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="mdui-icon material-icons">menu</i></a>
+    <a href="/" class="mdui-typo-headline">Ant-loiter个人博客</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-dialog="{target: '#search'}" mdui-tooltip="{content: 'Search'}"><i class="mdui-icon material-icons">search</i></a>
+    <a href="/atom.xml" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'RSS'}"><i class="mdui-icon material-icons">rss_feed</i></a>
+  </div>
+</header>
+<div class="mdui-dialog" id="search">
+  
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="请输入关键字"><input type="hidden" name="sitesearch" value="https://www.ant-loiter.com"></form>
+    <div class="search-result"></div>
+  
+</div>
+  <aside id="sidebar" class="mdui-drawer mdui-drawer-full-height">
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(a){document.getElementById("sidebar").className+=" mdui-drawer-close"};</script>
+  <div class="mdui-grid-tile">
+    <img src="/images/banner.png" style="height: 160px;">
+    <img src="/images/avatar.png" class="avatar-animation" style="position: absolute; top: 10%; left: 24px; width: 64px; height: 64px; border: 2px solid #fff; border-radius: 50%;">
+    <div class="mdui-grid-tile-actions">
+      <div class="mdui-grid-tile-text">
+        <div class="mdui-grid-tile-title">chenhj(brenda)</div>
+        <div class="mdui-grid-tile-subtitle"><i class="mdui-icon material-icons">art_track</i>www.ant-loiter.com</div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    <a href="/" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-blue">home</i>
+      <div class="mdui-list-item-content">Home</div>
+    </a>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-deep-orange">archive</i>
+        <div class="mdui-list-item-content">Archive</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/archives/2020/08/">八月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="mdui-ripple sidebar_archives-count">7</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/07/">七月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/06/">六月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/05/">五月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/04/">四月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/03/">三月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/02/">二月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/01/">一月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/12/">十二月 2018<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="mdui-ripple sidebar_archives-count">21</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/10/">十月 2018<span class="mdui-ripple sidebar_archives-count">8</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="mdui-ripple sidebar_archives-count">6</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-green">class</i>
+        <div class="mdui-list-item-content">Category</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/categories/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/MySQL-config/">MySQL config<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RabbitMQ-MQ-消息队列/">RabbitMQ MQ 消息队列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/apache-压力测试工具/">apache 压力测试工具<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/centos7防火墙-firewalld/">centos7防火墙 firewalld<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/cms-jvm-gc-Throught-Serial/">cms jvm gc Throught Serial<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/docker-mysql-pull/">docker mysql pull<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/elasticSearch-es/">elasticSearch es<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/spring-cloud-springboot-service/">spring cloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/微服务网关路由-GateWay/">微服务网关路由 GateWay<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/服务注册-Consul-Eureka-confi-SpringCloud/">服务注册 Consul Eureka confi SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构-MySQL/">架构 MySQL<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构性能分析/">架构性能分析<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-brown">bookmark</i>
+        <div class="mdui-list-item-content">Tag</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/tags/BigData-Spark-MapReduce/">BigData Spark MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ES-TS-JS/">ES TS JS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Egg-Alibaba-Node-js-Koa/">Egg Alibaba Node.js Koa<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/HBase-zookeeper-BigData/">HBase zookeeper BigData<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Linux-Centos-Nginx-Let’Encrypt-ssl-TLS/">Linux Centos Nginx Let’Encrypt ssl TLS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/MySQL-config-my-conf-案例/">MySQL config my.conf 案例<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Nginx-content-static-auto-index-index-random-index-concat/">Nginx content static auto_index index random_index concat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/PM-liangning-得到/">PM liangning 得到<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RabbitMQ-AMQP-对列/">RabbitMQ AMQP 对列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/SkyWalking-linkln-Lookup/">SkyWalking linkln Lookup<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/apache-ab-压力测试/">apache ab 压力测试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos-7-2-MariaDB-10-1-yum/">centos 7.2 MariaDB 10.1 yum<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos7-firewalld-iptables-防火墙/">centos7 firewalld iptables 防火墙<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/cms-gc-full-gc/">cms gc full gc<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/docker-mysql/">docker mysql<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/dubbo-rpc-面试/">dubbo rpc 面试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticSearch/">elasticSearch<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticsearch-HA-时实/">elasticsearch HA 时实<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/es-elastic-search-service/">es elastic search service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/gradle-maven-ant-new-publish-create/">gradle maven ant new publish create<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/guns-study-spring-spring-mvc-shro/">guns study spring spring mvc shro<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hadoop-hive-dataSkew/">hadoop hive dataSkew<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-bigdata/">hive bigdata<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-textfile-seqFile-RCFile-ORCFile-Parquet/">hive textfile seqFile RCFile ORCFile Parquet<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-规范-hexo/">java 规范 hexo<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-command/">linux command<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-ssh-keygen-git-免密-login/">linux ssh-keygen git 免密 login<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/logo-免密-ssh-keygen-登录-云服务器-ssh-keygen-无密码登录/">logo 免密 ssh-keygen 登录 云服务器  ssh-keygen 无密码登录<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-http/">nginx http<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openresty-tengine-ssl/">nginx openresty tengine ssl<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openretry-tengine-ngx-slab-stat/">nginx openretry tengine ngx_slab_stat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-web-config-nginx-conf/">nginx web config nginx.conf<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/presto/">presto<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/spring-jpa-data-Repository-ORM/">spring jpa data Repository ORM<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-GateWay-Zuul/">springcloud GateWay Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul/">springcloud config Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul-parallel-并发-concorrent-并行-Spring-Cloud-Bus/">springcloud config Zuul parallel(并发) concorrent(并行) Spring Cloud Bus<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-springboot-service/">springcloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-zuul-分布式模块-分布式/">springcloud zuul 分布式模块 分布式<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/todolist-work-jobs-myself/">todolist work jobs myself<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/wget-download-爬取/">wget download 爬取<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库-分表-公区-高效-海量数据/">分库 分表 公区 高效 海量数据<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/姜老师-第四天-MapReduce/">姜老师 第四天 MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/容量设计-架构-压力/">容量设计 架构 压力<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/服务注册-Consul-Eureka-confi-spring-cloud/">服务注册 Consul Eureka confi spring cloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/架构-MySQL-Master-Slave/">架构 MySQL Master Slave<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <a href="/about" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-purple">person</i>
+      <div class="mdui-list-item-content">About</div>
+    </a>
+  </div>
+
+  <div class="mdui-divider"></div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    
+      <a href="/tagcloud" class="mdui-list-item mdui-ripple">标签云</a>
+    
+      <a href="/gallery" class="mdui-list-item mdui-ripple">画廊</a>
+    
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <div class="mdui-list-item-content">Links</div>
+        <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        
+          <a href="javascript:;" class="mdui-list-item mdui-p-l-2 mdui-text-color-theme mdui-ripple" style="justify-content: center;">No Links</a>
+        
+      </div>
+    </div>
+  </div>
+</aside>
+  <main id="main" class="mdui-m-t-5 fadeIn animated">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.css">
+  <style>#main article .mdui-card-content .center-block{display:block!important;margin-right:auto!important;margin-left:auto!important}</style>
+  <article class="mdui-card mdui-m-b-5">
+    <header class="mdui-card-media">
+      <img src="/images/random/material-14.png" style="max-height: 240px;">
+      <div class="mdui-card-media-covered">
+        <div class="mdui-card-primary">
+          <div class="mdui-card-primary-title">nginx-http_nginx中http模块整理</div>
+          <div class="mdui-card-primary-subtitle"><i class="iconfont">&#xe697;</i> 2018-12-17 / <i class="iconfont">&#xe601;</i> chenhj(brenda)</div>
+        </div>
+      </div>
+      <div class="mdui-card-menu">
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#qrcode', align: 'right'}"><i class="mdui-icon material-icons">devices</i></button>
+          <ul class="mdui-menu" id="qrcode">
+            
+              <li class="mdui-menu-item"><a class="mdui-text-center mdui-ripple">发送到手机</a></li>
+            
+            <li class="mdui-menu-item" disabled>
+              
+                <img src="https://chart.googleapis.com/chart?cht=qr&chs=246x246&chl=https://www.ant-loiter.com/2018/12/17/nginx-http/&chld=M|2">
+              
+            </li>
+          </ul>
+        
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="mdui-icon material-icons">share</i></button>
+          <ul class="mdui-menu" id="share_menu">
+            <li class="mdui-menu-item">
+              <a href="http://service.weibo.com/share/share.php?appkey=&title=nginx-http_nginx中http模块整理&url=https://www.ant-loiter.com/2018/12/17/nginx-http/&pic=https://www.ant-loiter.com/images/favicon.png&searchPic=false&style=simple" target="_blank" class="mdui-ripple">Share to Weibo</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://twitter.com/intent/tweet?text=nginx-http_nginx中http模块整理&url=https://www.ant-loiter.com/2018/12/17/nginx-http/&via=chenhj(brenda)" target="_blank" class="mdui-ripple">Share to Twitter</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.ant-loiter.com/2018/12/17/nginx-http/" target="_blank" class="mdui-ripple">Share to Facebook</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://plus.google.com/share?url=https://www.ant-loiter.com/2018/12/17/nginx-http/" target="_blank" class="mdui-ripple">Share to Google+</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://www.ant-loiter.com/2018/12/17/nginx-http/&title=nginx-http_nginx中http模块整理" target="_blank" class="mdui-ripple">Share to LinkedIn</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="http://connect.qq.com/widget/shareqq/index.html?site=Ant-loiter个人博客&title=nginx-http_nginx中http模块整理&pics=https://www.ant-loiter.com/images/favicon.png&url=https://www.ant-loiter.com/2018/12/17/nginx-http/" target="_blank" class="mdui-ripple">Share to QQ</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://telegram.me/share/url?url=https://www.ant-loiter.com/2018/12/17/nginx-http/&text=nginx-http_nginx中http模块整理" target="_blank" class="mdui-ripple">Share to Telegram</a>
+            </li>
+          </ul>
+        
+      </div>
+    </header>
+    <div class="mdui-card-content mdui-typo">
+      <h2 id="ngx-http-referer-module"><a href="#ngx-http-referer-module" class="headerlink" title="ngx_http_referer_module"></a>ngx_http_referer_module</h2><p>是一个防盗链处理的模块； </p>
+<h2 id="listen指定配置"><a href="#listen指定配置" class="headerlink" title="listen指定配置"></a>listen指定配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">listen unix:/var/run/nginx.sock;</span><br><span class="line">listen 127.0.0.1:8000;</span><br><span class="line">listen 127.0.0.1;</span><br><span class="line">listen 8000;</span><br><span class="line">listen *:8000;</span><br><span class="line">listen localhost:8000 bind;</span><br><span class="line">listen [::]:8000 ipv6only=on;</span><br><span class="line">listen [::1];</span><br></pre></td></tr></table></figure>
+<h2 id="接收请求事件模块流程"><a href="#接收请求事件模块流程" class="headerlink" title="接收请求事件模块流程"></a>接收请求事件模块流程</h2><p>第一步： 操作系统内核：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SYN</span><br><span class="line">SYN + ACK</span><br><span class="line">ACK (负载均衡选中CPU上的worker)</span><br></pre></td></tr></table></figure></p>
+<p>第二步： 事件模块：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">epoll_wait</span><br><span class="line"></span><br><span class="line">accept, 分配连接内存池</span><br><span class="line">（connection_pool_size: 512）</span><br><span class="line">这个内存还不是解析请求uri的所需内存， 是用来存储连接用的； </span><br><span class="line"></span><br><span class="line">epoll_wait</span><br></pre></td></tr></table></figure></p>
+<p>第三步： HTTP模块：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ngx_http_init_commection 设置回调方法， ecpoll_wait， 添加超时定时器</span><br><span class="line">client_header_timeout: 60s; 在这里创建了一个请求连接的超时时间，如果在这个时间内没有获取连接，就会自动超时断开连接； </span><br><span class="line"></span><br><span class="line">ngx_http_wait_request_handler 分配内存， read读缓冲区</span><br><span class="line">client_header_buffer_size: 1K;</span><br><span class="line">用来存放请示头部的信息，主要可能是cookie比较大</span><br></pre></td></tr></table></figure>
+<h2 id="接收请求HTTP模块"><a href="#接收请求HTTP模块" class="headerlink" title="接收请求HTTP模块"></a>接收请求HTTP模块</h2><p>接收URI<br>分配请求内存池（request_pool_size: 4K)<br>这个分配的内存是用来存放解新http请求URI的数据，如果内容很大。 会进行大内存分配<br>large_client_header_buffers: 4 8K<br>会进行四次递增分配，每次8K， 不会一下分配出32k的内存空间； </p>
+<h2 id="处理请求头部数据"><a href="#处理请求头部数据" class="headerlink" title="处理请求头部数据"></a>处理请求头部数据</h2><p>过大的请求头部</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">default:</span><br><span class="line"></span><br><span class="line">Syntax:  client_header_buffer_size size;</span><br><span class="line">Default:   client_header_buffer_size 1k;</span><br><span class="line">Context:  http, server</span><br><span class="line"></span><br><span class="line">Syntax:   large_client_header_buffers  number size;</span><br><span class="line">Default:   large_client_header_buffers 4 8k;</span><br><span class="line">Context:   http, server</span><br></pre></td></tr></table></figure>
+<h2 id="Server-name指令"><a href="#Server-name指令" class="headerlink" title="Server_name指令"></a>Server_name指令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">指令后可以跟多个域名， 第一个被 认为是指定的主域名</span><br><span class="line"></span><br><span class="line">Syntax : server_name_in_redirect on|off;</span><br><span class="line">Default: server_name_in_redirect off;</span><br><span class="line">Context http, server, location</span><br></pre></td></tr></table></figure>
+<p><strong>可以指定一个泛域名， 仅支持在最前或者最后配置</strong><br>如：<br>server_name <em>.ant-loiter.com<br>server_name </em>.ant-loiter.*</p>
+<p>正则表达式配置，必须在配置域名前加~符号表示正则配置开始； </p>
+<p>server_name <a href="http://www.ant-loiter.com">www.ant-loiter.com</a> ~^www\d+.ant-loiter.com&amp;;</p>
+<h2 id="在server模块中定了return的语法："><a href="#在server模块中定了return的语法：" class="headerlink" title="在server模块中定了return的语法："></a>在server模块中定了return的语法：</h2><p>如：<br><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">  <span class="attribute">server_name</span> primary.ant-loiter.com;</span><br><span class="line">  <span class="attribute">set_real_ip_from</span>  <span class="number">192.168.1.120</span>;</span><br><span class="line">  <span class="attribute">real_ip_recursive</span> <span class="literal">off</span>;</span><br><span class="line">  <span class="attribute">real_ip_header</span>  X-Forwarded-For;</span><br><span class="line"></span><br><span class="line">  <span class="attribute">location</span> / &#123;</span><br><span class="line">    <span class="attribute">return</span> <span class="number">302</span> <span class="string">"https://www.ant-loiter.com"</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码代里面，如果命中这个规划就会被重新定向到指定的URL中； 但在在http1.0和http1.1里面针对重定向的code定义有所不同； 如下：</p>
+<h3 id="http1-0定义："><a href="#http1-0定义：" class="headerlink" title="http1.0定义："></a>http1.0定义：</h3><p>301： http永久重定向<br>302： 临时重定向， 禁止被缓存 </p>
+<h3 id="http1-1定义："><a href="#http1-1定义：" class="headerlink" title="http1.1定义："></a>http1.1定义：</h3><p>303: 临时重定向， 允许改变方法， 禁止被缓存<br>307： 临时重定向， 不允许改变方法， 禁止被缓存<br>308: 永久重定向， 不允许改变方法</p>
+<h2 id="HTTP请求处理时的11个阶段"><a href="#HTTP请求处理时的11个阶段" class="headerlink" title="HTTP请求处理时的11个阶段"></a>HTTP请求处理时的11个阶段</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">阶段名</th>
+<th style="text-align:center">模块名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">POST_READ</td>
+<td style="text-align:center">realip</td>
+</tr>
+<tr>
+<td style="text-align:center">SERVER_REWRITE</td>
+<td style="text-align:center">rewrite</td>
+</tr>
+<tr>
+<td style="text-align:center">FIND_CONFIG</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">REWRITE</td>
+<td style="text-align:center">rewrite</td>
+</tr>
+<tr>
+<td style="text-align:center">POST_REWRITE</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">PREACCESS</td>
+<td style="text-align:center">limt_conn, limit_req</td>
+</tr>
+<tr>
+<td style="text-align:center">ACCESS</td>
+<td style="text-align:center">auth_basic, access, auth_request</td>
+</tr>
+<tr>
+<td style="text-align:center">POST_ACCESS</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">PRECONTENT</td>
+<td style="text-align:center">try_files</td>
+</tr>
+<tr>
+<td style="text-align:center">CONTENT</td>
+<td style="text-align:center">index, autoindex, concat</td>
+</tr>
+<tr>
+<td style="text-align:center">LOG</td>
+<td style="text-align:center">access_log</td>
+</tr>
+</tbody>
+</table>
+<h2 id="error-page命令语法如下："><a href="#error-page命令语法如下：" class="headerlink" title="error_page命令语法如下："></a>error_page命令语法如下：</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Syntax: Default: Context: </span><br><span class="line">error_page code ... [=[response]] uri; http, server, location, if in location </span><br><span class="line">如：</span><br><span class="line"></span><br><span class="line">1. error_page 404 /404.html;</span><br><span class="line">2. error_page 500 502 503 504 /50x.html;</span><br><span class="line">3. error_page 404 =200 /empty.gif;</span><br><span class="line">4. error_page 404 = /404.php;</span><br><span class="line">5. location / &#123;error_page 404 = @fallback; &#125;location @fallback &#123;proxy_pass http://backend;&#125;</span><br><span class="line">6. error_page 403 http://example.com/forbidden.html;</span><br><span class="line">7. error_page 404 =301 http://example.com/notfound.html;</span><br></pre></td></tr></table></figure>
+<h2 id="rewrite模块：-rewrite指令"><a href="#rewrite模块：-rewrite指令" class="headerlink" title="rewrite模块： rewrite指令"></a>rewrite模块： rewrite指令</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Syntax: rewrite  regex replacement[flag];</span><br><span class="line">Default:   ----</span><br><span class="line">Context:   server, location , if</span><br><span class="line"></span><br><span class="line">说明：</span><br><span class="line"></span><br><span class="line">将regex指定的url替换成replacement这个新的url</span><br><span class="line">- 可以使用正则表达式及变量提取； </span><br><span class="line"></span><br><span class="line">当replacement以http://或者https://或者$schema开头， 则直接返回302重定向</span><br><span class="line"></span><br><span class="line">替换后的url根据flag 指定的方式进行处理，如下：</span><br><span class="line"></span><br><span class="line">- last : 用replacement这个URL进行新的location匹配</span><br><span class="line"></span><br><span class="line">- break： break指令停止当前脚本指令的执行， 等价于独立的break指令； </span><br><span class="line"></span><br><span class="line">- redirect: 返回302重定向， 并向新的replacement连接重定向跳转； </span><br><span class="line"></span><br><span class="line">- permanent: 返回301重定向， 并赂新的replacement链接重定向跳转；</span><br></pre></td></tr></table></figure>
+<h2 id="location匹配规则，-仅匹配URI，-忽略参数"><a href="#location匹配规则，-仅匹配URI，-忽略参数" class="headerlink" title="location匹配规则， 仅匹配URI， 忽略参数"></a>location匹配规则， 仅匹配URI， 忽略参数</h2><ul>
+<li><p>前缀字符串匹配<br>常规<br>=  表示精确匹配<br>^~  表示匹配上后则不再进行正则表达式匹配， 如果根后面的字符匹配上后， 是不会再进行正则表达式的匹配的， 就算有匹配的正则表达式； </p>
+</li>
+<li><p>正则表达式匹配<br>~ 表示大小写敏感的正则匹配<br>~* 表示忽略大小写的正则匹配（大小写不敏感）</p>
+</li>
+<li><p>用于内部跳转的命名location </p>
+</li>
+</ul>
+<p>@ 用来表示配置文件内部不同location间的跳转； </p>
+<ul>
+<li><p>合并连续/ 符号</p>
+<p>merge_slashes   on/off; </p>
+<p>表示是否要合并URI中连续的//符号； 如果url没有被编码后， 建议配置为on,即表示合并 ； </p>
+</li>
+</ul>
+<h2 id="limit-conn指令"><a href="#limit-conn指令" class="headerlink" title="limit_conn指令"></a>limit_conn指令</h2><p>定义共享内存（包括大小）， 以及key关键字<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Syntax: limit_conn_zone key zone=name:size;</span><br><span class="line">Default: ---</span><br><span class="line">Context: http</span><br></pre></td></tr></table></figure></p>
+<h2 id="限制并发连接数"><a href="#限制并发连接数" class="headerlink" title="限制并发连接数"></a>限制并发连接数</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Syntax:  limit_conn  zone number;</span><br><span class="line">Default:  ---</span><br><span class="line">Context: http, server, location</span><br></pre></td></tr></table></figure>
+<h2 id="限制发生时的日志级别"><a href="#限制发生时的日志级别" class="headerlink" title="限制发生时的日志级别"></a>限制发生时的日志级别</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Syntax: limit_conn_log_level info|notice|warn|error;</span><br><span class="line">Default:  limit_conn_log_level error;</span><br><span class="line">Context: http, server, location</span><br></pre></td></tr></table></figure>
+<h2 id="限制发生时向客户端返回的错误码"><a href="#限制发生时向客户端返回的错误码" class="headerlink" title="限制发生时向客户端返回的错误码"></a>限制发生时向客户端返回的错误码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Syntax: limit_conn_status code;</span><br><span class="line">Default: limit_conn_status 503;</span><br><span class="line">Context:  http, server, location</span><br></pre></td></tr></table></figure>
+<h2 id="创建一个共享内存"><a href="#创建一个共享内存" class="headerlink" title="创建一个共享内存"></a>创建一个共享内存</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 以下代码是在http模块里</span><br><span class="line">limit_conn_zone  $binary_remote_addr zone=addr:10m;</span><br><span class="line">limit_conn_zone $binary_remote_addr zone=one:10m rate=3r/s;</span><br><span class="line"></span><br><span class="line">server &#123;</span><br><span class="line">  server_name limit.taofei.tech;</span><br><span class="line">  root html/;</span><br><span class="line">  error_log logs/myerror.log info;</span><br><span class="line"></span><br><span class="line">  location / &#123;</span><br><span class="line">    # 自定义了超出了最大连接数时返回的错误码；</span><br><span class="line">    limit_conn_status 500;</span><br><span class="line">    # 自定义了连接最大连接的错误级别； </span><br><span class="line">    limit_conn_log_level warn;</span><br><span class="line">    # 限制极限的返回的速度， 这个配置是每秒50字节； </span><br><span class="line">    limit_rate 50;</span><br><span class="line">    # 限制同时的并发连接数限制为1</span><br><span class="line">    limit_conn addr 1;</span><br><span class="line">    # limit_req zone=one burst=1 nodelay;</span><br><span class="line">    # limit_req zone=one;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="limit-req指令"><a href="#limit-req指令" class="headerlink" title="limit_req指令"></a>limit_req指令</h2><ul>
+<li><p>定义共享内存（包括大小）以及key关键字和限制速率</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Syntax:   limit_req_zone  key zone=name:size rate=rate;</span><br><span class="line">Default:    --</span><br><span class="line">Context:  http</span><br><span class="line">rate取值单位： r/s 每秒多少个请求；  r/m  每分钟多少个请求；</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>限制并发请求连接数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Syntax:   limit_req zone=name [burst=number] [nodelay]</span><br><span class="line">Default:   ---</span><br><span class="line">Context:  http, server, location</span><br><span class="line"></span><br><span class="line">说明：</span><br><span class="line">burst默认为0 </span><br><span class="line">nodelay, 对burst中的请求不再采用延时处理的做法， 而是立刻处理；</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>限制发生时的日志级别</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Syntax:  limit_req_log_level  info|notice|warn|error;</span><br><span class="line">Default:   limit_req_log_level  error;</span><br><span class="line">Context:    http,server,location</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>限制发生时向客户返回的错误码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Syntax:  limit_req_status code;</span><br><span class="line">Default:   limit_red_status   503;</span><br><span class="line">Context:  http, server, location</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="如何限制某些IP地址的访问权限？"><a href="#如何限制某些IP地址的访问权限？" class="headerlink" title="如何限制某些IP地址的访问权限？"></a>如何限制某些IP地址的访问权限？</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Syntax:  allow address | CIDR | unix: | all;</span><br><span class="line">Default:  -- </span><br><span class="line">Context:  http, server, location, limit_except</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Syntax:  deny address |CIDR | unix: | all;</span><br><span class="line">Default:  -- </span><br><span class="line">Context: http, server, location, limit_except</span><br><span class="line"></span><br><span class="line">如：</span><br><span class="line">location  / &#123;</span><br><span class="line"></span><br><span class="line">  deny 192.168.1.1;</span><br><span class="line">  allow 192.168.1.0/24;</span><br><span class="line">  allow 10.1.1.0/16;</span><br><span class="line">  allow 2001:0db8::/32;</span><br><span class="line">  deny all;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">以上请求是单项目匹配的， 只要匹配到一个规则就会结束匹配；</span><br></pre></td></tr></table></figure>
+<h2 id="auth-basic模块的指令"><a href="#auth-basic模块的指令" class="headerlink" title="auth_basic模块的指令"></a>auth_basic模块的指令</h2><ul>
+<li><p>功能：<br>基于HTTP Basic Authutication协议进行用户名密码认证； </p>
+<p>默认编译进Nginx<br>   –without-http_auth_basic_module<br>   在编码时添加上面的配置就可以把这个模块去除； </p>
+</li>
+<li><p>指令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Syntax: auth_basic string|off;  这里的string会显示在输入账号密码窗口的标题上； </span><br><span class="line">Default:  auth_basic off;</span><br><span class="line">Context:  http, server, location, limit_except</span><br><span class="line"></span><br><span class="line">Syntax:  auth_basic_user_file   file;</span><br><span class="line">Default:   --</span><br><span class="line">Context:   http, server, location, limit_except</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在认证时，需要有账号密码， 可以通过httpd-tools工具还生成账号密码文件； </li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">htpasswd -c file -b user pass</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+      <blockquote>
+        
+        <strong>PermaLink: </strong><br><a href="https://www.ant-loiter.com/2018/12/17/nginx-http/">https://www.ant-loiter.com/2018/12/17/nginx-http/</a>
+      </blockquote>
+    </div>
+    <footer class="mdui-card-actions">
+      
+      
+        <a class="mdui-ripple article_tags-link" href="/tags/nginx-http/">nginx http</a>
+      
+    </footer>
+    
+  </article>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+  <script>$("#main article .mdui-card-content img.fancybox").on("click",function(e){$.fancybox.open({src:$(this).attr("src")});});</script>
+
+
+  <nav id="paginator">
+    
+      <a rel="prev" class="extend prev" href="/2018/12/20/nginx-http-content-module/">
+        <button aria-label="prev" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_back</i></button>
+        <span class="mdui-p-x-3" mdui-tooltip="{content: 'Nginx在处理请求的11个过程中的Content的处理阶段笔记'}">Prev</span>
+      </a>
+    
+    <div class="spacer"></div>
+    
+      <a rel="next" class="extend next" href="/2018/12/12/Linux常用命令收集（不断更新）/">
+        <span class="mdui-p-x-3" mdui-tooltip="{content: 'Linux常用命令收集（不断更新）'}">Next</span>
+        <button aria-label="next" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_forward</i></button>
+      </a>
+    
+  </nav>
+
+
+
+</main>
+  <footer id="footer" class="mdui-m-t-5 mdui-p-y-3 mdui-color-theme">
+  <div class="mdui-p-y-0 mdui-text-center">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </div>
+  <div class="mdui-p-y-1 mdui-text-center">
+    Copyright &copy; 2020 chenhj(brenda)<br>
+    Powered by <a href="https://hexo.io/" target="_blank" class="mdui-text-color-theme-accent">Hexo</a>
+    
+  </div>
+</footer>
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_upward</i></button>
+  
+  <script src="/js/mdui.js"></script>
+<script src="/js/script.js"></script>
+  <script src="/custom.js"></script>
+</body>
+</html>

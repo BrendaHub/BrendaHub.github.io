@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="renderer" content="webkit">
+
+  
+  <title>SpringFormwork001 | Ant-loiter个人博客</title>
+
+  <link rel="shortcut icon" href="/images/favicon.png">
+  <link rel="alternate" href="/atom.xml" title="Ant-loiter个人博客">
+  <meta name="description" content="Spring 模块spring FrameWork的模块化与java 9的模块化有所不同；  Spring 模块化设计（Modular）   序号 模块名 描述说明 序号 模块名 描述说明     1 spring-aop  2 spring-jms    3 spring-aspects  4 spring-messaging 统一消息的实现如jms，kafka等MQ   5 spring-co">
+<meta name="keywords" content="Spring Framework SpringBoot SpringCloud">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringFormwork001">
+<meta property="og:url" content="https://www.ant-loiter.com/2020/06/18/SpringFormwork001/index.html">
+<meta property="og:site_name" content="Ant-loiter个人博客">
+<meta property="og:description" content="Spring 模块spring FrameWork的模块化与java 9的模块化有所不同；  Spring 模块化设计（Modular）   序号 模块名 描述说明 序号 模块名 描述说明     1 spring-aop  2 spring-jms    3 spring-aspects  4 spring-messaging 统一消息的实现如jms，kafka等MQ   5 spring-co">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:updated_time" content="2020-10-30T13:49:33.119Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringFormwork001">
+<meta name="twitter:description" content="Spring 模块spring FrameWork的模块化与java 9的模块化有所不同；  Spring 模块化设计（Modular）   序号 模块名 描述说明 序号 模块名 描述说明     1 spring-aop  2 spring-jms    3 spring-aspects  4 spring-messaging 统一消息的实现如jms，kafka等MQ   5 spring-co">
+
+  <meta name="keywords" content=",Spring Framework SpringBoot SpringCloud">
+  <meta name="format-detection" content="telephone=no,email=no">
+  <meta name="theme-color" content="#9C27B0">
+
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Ant-loiter个人博客">
+  <meta name="msapplication-starturl" content="https://www.ant-loiter.com/2020/06/18/SpringFormwork001/">
+  <meta name="msapplication-navbutton-color" content="#9C27B0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ant-loiter个人博客">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="/images/favicon.png">
+
+  
+    <link rel="canonical" href="https://www.ant-loiter.com/2020/06/18/SpringFormwork001/">
+  
+
+  
+  
+
+  
+  
+  
+
+  <link rel="stylesheet" href="/css/mdui.css">
+<link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/custom.css">
+</head>
+<body class="mdui-appbar-with-toolbar mdui-theme-primary-indigo mdui-theme-accent-pink">
+  <script>var a=localStorage.getItem("mdui-theme-layout-dark");if(a){document.getElementsByTagName("body")[0].className+=" mdui-theme-layout-dark"};</script>
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(!a){document.getElementsByTagName("body")[0].className+=" mdui-drawer-body-left"};</script>
+  <header id="header" class="mdui-appbar mdui-appbar-fixed mdui-appbar-scroll-hide mdui-appbar-inset">
+  <div class="mdui-toolbar mdui-color-theme">
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-drawer="{target: '#sidebar', swipe: true}"><i class="mdui-icon material-icons">menu</i></a>
+    <a href="/" class="mdui-typo-headline">Ant-loiter个人博客</a>
+    <div class="mdui-toolbar-spacer"></div>
+    <a href="javascript:;" class="mdui-btn mdui-btn-icon" mdui-dialog="{target: '#search'}" mdui-tooltip="{content: 'Search'}"><i class="mdui-icon material-icons">search</i></a>
+    <a href="/atom.xml" class="mdui-btn mdui-btn-icon" mdui-tooltip="{content: 'RSS'}"><i class="mdui-icon material-icons">rss_feed</i></a>
+  </div>
+</header>
+<div class="mdui-dialog" id="search">
+  
+    <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="请输入关键字"><input type="hidden" name="sitesearch" value="https://www.ant-loiter.com"></form>
+    <div class="search-result"></div>
+  
+</div>
+  <aside id="sidebar" class="mdui-drawer mdui-drawer-full-height">
+  <script>var a=localStorage.getItem("mdui-drawer-close");if(a){document.getElementById("sidebar").className+=" mdui-drawer-close"};</script>
+  <div class="mdui-grid-tile">
+    <img src="/images/banner.png" style="height: 160px;">
+    <img src="/images/avatar.png" class="avatar-animation" style="position: absolute; top: 10%; left: 24px; width: 64px; height: 64px; border: 2px solid #fff; border-radius: 50%;">
+    <div class="mdui-grid-tile-actions">
+      <div class="mdui-grid-tile-text">
+        <div class="mdui-grid-tile-title">chenhj(brenda)</div>
+        <div class="mdui-grid-tile-subtitle"><i class="mdui-icon material-icons">art_track</i>www.ant-loiter.com</div>
+      </div>
+      
+    </div>
+  </div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    <a href="/" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-blue">home</i>
+      <div class="mdui-list-item-content">Home</div>
+    </a>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-deep-orange">archive</i>
+        <div class="mdui-list-item-content">Archive</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/archives/2020/08/">八月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/07/">七月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/06/">六月 2020<span class="mdui-ripple sidebar_archives-count">7</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/05/">五月 2020<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2020/01/">一月 2020<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/07/">七月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/06/">六月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/05/">五月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/04/">四月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/03/">三月 2019<span class="mdui-ripple sidebar_archives-count">6</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/02/">二月 2019<span class="mdui-ripple sidebar_archives-count">5</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2019/01/">一月 2019<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/12/">十二月 2018<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/11/">十一月 2018<span class="mdui-ripple sidebar_archives-count">21</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/10/">十月 2018<span class="mdui-ripple sidebar_archives-count">8</span></a><a class="mdui-ripple sidebar_archives-link" href="/archives/2018/09/">九月 2018<span class="mdui-ripple sidebar_archives-count">6</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-green">class</i>
+        <div class="mdui-list-item-content">Category</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/categories/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/MySQL-config/">MySQL config<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RabbitMQ-MQ-消息队列/">RabbitMQ MQ 消息队列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/apache-压力测试工具/">apache 压力测试工具<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/centos7防火墙-firewalld/">centos7防火墙 firewalld<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/cms-jvm-gc-Throught-Serial/">cms jvm gc Throught Serial<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/docker-mysql-pull/">docker mysql pull<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/elasticSearch-es/">elasticSearch es<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/spring-cloud-springboot-service/">spring cloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/微服务网关路由-GateWay/">微服务网关路由 GateWay<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/服务注册-Consul-Eureka-confi-SpringCloud/">服务注册 Consul Eureka confi SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构-MySQL/">架构 MySQL<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/categories/架构性能分析/">架构性能分析<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-brown">bookmark</i>
+        <div class="mdui-list-item-content">Tag</div>
+        <i class="mdui-collapse-item-arrow mdui-icon material-icons">keyboard_arrow_down</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        <a class="mdui-ripple sidebar_archives-link" href="/tags/BigData-Spark-MapReduce/">BigData Spark MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/CAP/">CAP<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ES-TS-JS/">ES TS JS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Egg-Alibaba-Node-js-Koa/">Egg Alibaba Node.js Koa<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/HBase-zookeeper-BigData/">HBase zookeeper BigData<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Java-Enterprise-Architest-Info/">Java Enterprise Architest Info<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Linux-Centos-Nginx-Let’Encrypt-ssl-TLS/">Linux Centos Nginx Let’Encrypt ssl TLS<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Master-Slave-Backup-Restore/">Master Slave Backup Restore<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/MySQL-config-my-conf-案例/">MySQL config my.conf 案例<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Netty-NetWork-NetWork-Protocol/">Netty NetWork NetWork Protocol<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Nginx-content-static-auto-index-index-random-index-concat/">Nginx content static auto_index index random_index concat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/PM-liangning-得到/">PM liangning 得到<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RabbitMQ-AMQP-对列/">RabbitMQ AMQP 对列<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Redis-Distributed-Lock-Cache/">Redis Distributed Lock Cache<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/RocketMQ-Alibaba-MQ-Message/">RocketMQ Alibaba MQ Message<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/SkyWalking-linkln-Lookup/">SkyWalking linkln Lookup<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/ajax-cross-domain-miroservice/">ajax cross domain miroservice<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/aop-pointcut-aspect-springcloud/">aop pointcut aspect springcloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/apache-ab-压力测试/">apache ab 压力测试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/bigdata-hadoop-yarn-kafka-hdfs-flum-sqoop-hbase-zookeeper-hive/">bigdata hadoop yarn kafka hdfs flum sqoop hbase zookeeper hive<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos-7-2-MariaDB-10-1-yum/">centos 7.2 MariaDB 10.1 yum<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/centos7-firewalld-iptables-防火墙/">centos7 firewalld iptables 防火墙<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/cms-gc-full-gc/">cms gc full gc<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/disruptor-高并发-多线程-无锁/">disruptor 高并发 多线程 无锁<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/docker-mysql/">docker mysql<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/dubbo-rpc-面试/">dubbo rpc 面试<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticSearch/">elasticSearch<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/elasticsearch-HA-时实/">elasticsearch HA 时实<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/es-elastic-search-service/">es elastic search service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/gradle-maven-ant-new-publish-create/">gradle maven ant new publish create<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/guns-study-spring-spring-mvc-shro/">guns study spring spring mvc shro<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hadoop-hive-dataSkew/">hadoop hive dataSkew<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-bigdata/">hive bigdata<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/hive-textfile-seqFile-RCFile-ORCFile-Parquet/">hive textfile seqFile RCFile ORCFile Parquet<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-jdk-openjdk-oracle/">java jdk openjdk oracle<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-study-note/">java study note<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/java-规范-hexo/">java 规范 hexo<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/jvm-java-jre-info/">jvm java jre info<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-command/">linux command<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/linux-ssh-keygen-git-免密-login/">linux ssh-keygen git 免密 login<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/logo-免密-ssh-keygen-登录-云服务器-ssh-keygen-无密码登录/">logo 免密 ssh-keygen 登录 云服务器  ssh-keygen 无密码登录<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mac-nodejs-version-upgrade/">mac nodejs version upgrade<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/md5-sha-checksum-signature/">md5 sha checksum signature<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mybatis-mybatis-plus-orm/">mybatis mybatis-plus orm<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/mysql-8-0-database/">mysql 8.0 database<span class="mdui-ripple sidebar_archives-count">4</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-http/">nginx http<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openresty-tengine-ssl/">nginx openresty tengine ssl<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-openretry-tengine-ngx-slab-stat/">nginx openretry tengine ngx_slab_stat<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/nginx-web-config-nginx-conf/">nginx web config nginx.conf<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/node-n-mac-managerversion/">node n mac managerversion<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/presto/">presto<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-config-nosql-cacheserver/">redis config nosql cacheserver<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/redis-master-slave-sentinel-cluster/">redis master/slave sentinel cluster<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/spring-jpa-data-Repository-ORM/">spring jpa data Repository ORM<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-GateWay-Zuul/">springcloud GateWay Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul/">springcloud config Zuul<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-config-Zuul-parallel-并发-concorrent-并行-Spring-Cloud-Bus/">springcloud config Zuul parallel(并发) concorrent(并行) Spring Cloud Bus<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-springboot-service/">springcloud springboot service<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/springcloud-zuul-分布式模块-分布式/">springcloud zuul 分布式模块 分布式<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/todolist-work-jobs-myself/">todolist work jobs myself<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/volatile-java-synchronized/">volatile java synchronized<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/wget-download-爬取/">wget download 爬取<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/zookeeper-分布式-注册-管理/">zookeeper 分布式 注册 管理<span class="mdui-ripple sidebar_archives-count">2</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库-分表-公区-高效-海量数据/">分库 分表 公区 高效 海量数据<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/分库分表-实战/">分库分表 实战<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/姜老师-第四天-MapReduce/">姜老师 第四天 MapReduce<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/容量设计-架构-压力/">容量设计 架构 压力<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/服务注册-Consul-Eureka-confi-spring-cloud/">服务注册 Consul Eureka confi spring cloud<span class="mdui-ripple sidebar_archives-count">1</span></a><a class="mdui-ripple sidebar_archives-link" href="/tags/架构-MySQL-Master-Slave/">架构 MySQL Master Slave<span class="mdui-ripple sidebar_archives-count">1</span></a>
+        
+      </div>
+    </div>
+    <a href="/about" class="mdui-list-item mdui-ripple">
+      <i class="mdui-list-item-icon mdui-icon material-icons mdui-text-color-purple">person</i>
+      <div class="mdui-list-item-content">About</div>
+    </a>
+  </div>
+
+  <div class="mdui-divider"></div>
+
+  <div class="mdui-list" mdui-collapse="{accordion: true}">
+    
+      <a href="/tagcloud" class="mdui-list-item mdui-ripple">标签云</a>
+    
+      <a href="/gallery" class="mdui-list-item mdui-ripple">画廊</a>
+    
+    <div class="mdui-collapse-item">
+      <div class="mdui-collapse-item-header mdui-list-item mdui-ripple">
+        <div class="mdui-list-item-content">Links</div>
+        <i class="mdui-list-item-icon mdui-icon material-icons">link</i>
+      </div>
+      <div class="mdui-collapse-item-body mdui-list mdui-list-dense">
+        
+        
+          <a href="javascript:;" class="mdui-list-item mdui-p-l-2 mdui-text-color-theme mdui-ripple" style="justify-content: center;">No Links</a>
+        
+      </div>
+    </div>
+  </div>
+</aside>
+  <main id="main" class="mdui-m-t-5 fadeIn animated">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.css">
+  <style>#main article .mdui-card-content .center-block{display:block!important;margin-right:auto!important;margin-left:auto!important}</style>
+  <article class="mdui-card mdui-m-b-5">
+    <header class="mdui-card-media">
+      <img src="/images/random/material-6.png" style="max-height: 240px;">
+      <div class="mdui-card-media-covered">
+        <div class="mdui-card-primary">
+          <div class="mdui-card-primary-title">SpringFormwork001</div>
+          <div class="mdui-card-primary-subtitle"><i class="iconfont">&#xe697;</i> 2020-06-18 / <i class="iconfont">&#xe601;</i> chenhj(brenda)</div>
+        </div>
+      </div>
+      <div class="mdui-card-menu">
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#qrcode', align: 'right'}"><i class="mdui-icon material-icons">devices</i></button>
+          <ul class="mdui-menu" id="qrcode">
+            
+              <li class="mdui-menu-item"><a class="mdui-text-center mdui-ripple">发送到手机</a></li>
+            
+            <li class="mdui-menu-item" disabled>
+              
+                <img src="https://chart.googleapis.com/chart?cht=qr&chs=246x246&chl=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/&chld=M|2">
+              
+            </li>
+          </ul>
+        
+        
+          <button class="mdui-btn mdui-btn-icon mdui-text-color-white" mdui-menu="{target: '#share_menu', align: 'right'}"><i class="mdui-icon material-icons">share</i></button>
+          <ul class="mdui-menu" id="share_menu">
+            <li class="mdui-menu-item">
+              <a href="http://service.weibo.com/share/share.php?appkey=&title=SpringFormwork001&url=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/&pic=https://www.ant-loiter.com/images/favicon.png&searchPic=false&style=simple" target="_blank" class="mdui-ripple">Share to Weibo</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://twitter.com/intent/tweet?text=SpringFormwork001&url=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/&via=chenhj(brenda)" target="_blank" class="mdui-ripple">Share to Twitter</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.facebook.com/sharer/sharer.php?u=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/" target="_blank" class="mdui-ripple">Share to Facebook</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://plus.google.com/share?url=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/" target="_blank" class="mdui-ripple">Share to Google+</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/&title=SpringFormwork001" target="_blank" class="mdui-ripple">Share to LinkedIn</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="http://connect.qq.com/widget/shareqq/index.html?site=Ant-loiter个人博客&title=SpringFormwork001&pics=https://www.ant-loiter.com/images/favicon.png&url=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/" target="_blank" class="mdui-ripple">Share to QQ</a>
+            </li>
+            <li class="mdui-menu-item">
+              <a href="https://telegram.me/share/url?url=https://www.ant-loiter.com/2020/06/18/SpringFormwork001/&text=SpringFormwork001" target="_blank" class="mdui-ripple">Share to Telegram</a>
+            </li>
+          </ul>
+        
+      </div>
+    </header>
+    <div class="mdui-card-content mdui-typo">
+      <h1 id="Spring-模块"><a href="#Spring-模块" class="headerlink" title="Spring 模块"></a>Spring 模块</h1><p>spring FrameWork的模块化与java 9的模块化有所不同； </p>
+<h1 id="Spring-模块化设计（Modular）"><a href="#Spring-模块化设计（Modular）" class="headerlink" title="Spring 模块化设计（Modular）"></a>Spring 模块化设计（Modular）</h1><table>
+<thead>
+<tr>
+<th style="text-align:center">序号</th>
+<th style="text-align:center">模块名</th>
+<th style="text-align:center">描述说明</th>
+<th style="text-align:center">序号</th>
+<th style="text-align:center">模块名</th>
+<th style="text-align:center">描述说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">1</td>
+<td style="text-align:center">spring-aop</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">spring-jms</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">3</td>
+<td style="text-align:center">spring-aspects</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">spring-messaging</td>
+<td style="text-align:center">统一消息的实现如jms，kafka等MQ</td>
+</tr>
+<tr>
+<td style="text-align:center">5</td>
+<td style="text-align:center">spring-context-indexer</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">spring-orm</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">7</td>
+<td style="text-align:center">spring-context-support</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">8</td>
+<td style="text-align:center">spring-oxm</td>
+<td style="text-align:center">xml的序列化反序列化的模块</td>
+</tr>
+<tr>
+<td style="text-align:center">9</td>
+<td style="text-align:center">spring-context</td>
+<td style="text-align:center">与spring-beans合成实现了IOC的功能,通地这core模块支持</td>
+<td style="text-align:center">10</td>
+<td style="text-align:center">spring-text</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">11</td>
+<td style="text-align:center">spring-core</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">12</td>
+<td style="text-align:center">spring-tx</td>
+<td style="text-align:center">spring的事物抽象</td>
+</tr>
+<tr>
+<td style="text-align:center">13</td>
+<td style="text-align:center">spring-expression</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">14</td>
+<td style="text-align:center">spring-web</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">15</td>
+<td style="text-align:center">spring-instrument</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">16</td>
+<td style="text-align:center">spring-webflux</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">17</td>
+<td style="text-align:center">spring-jcl</td>
+<td style="text-align:center">新模块从spring5开始支持的是spring引入的一个新型的日志框架spring以前就是通过comment-loging来支持的</td>
+<td style="text-align:center">18</td>
+<td style="text-align:center">spring-webmvc</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">19</td>
+<td style="text-align:center">spring-jdbc</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">20</td>
+<td style="text-align:center">spring-websocket</td>
+</tr>
+</tbody>
+</table>
+<p>change master to master_host=’192.168.1.212’,master_user=’repl1’,master_password=‘Test@123’,master_log_file=’mysql-bin.000002’,master_log_pos=443;</p>
+<h2 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h2><ul>
+<li>jsp 官方网址： <a href="https://jcp.org/" target="_blank" rel="noopener">https://jcp.org/</a></li>
+<li>小马哥JSR收藏： <a href="https://github.com/mercyblitz/jsr" target="_blank" rel="noopener">https://github.com/mercyblitz/jsr</a></li>
+<li>Spring官方文档根路径： <a href="https://docs.spring.io/spring/docs" target="_blank" rel="noopener">https://docs.spring.io/spring/docs</a><br><a href="https://docs.spring.io/spring-boot/docs" target="_blank" rel="noopener">https://docs.spring.io/spring-boot/docs</a></li>
+</ul>
+<h2 id="Spring编程模型"><a href="#Spring编程模型" class="headerlink" title="Spring编程模型"></a>Spring编程模型</h2><ul>
+<li>面向对象编程</li>
+<li>面向切面编程</li>
+<li>面向元编程</li>
+<li>函数驱动</li>
+<li>模块驱动</li>
+</ul>
+<h2 id="IOC-容器的职责"><a href="#IOC-容器的职责" class="headerlink" title="IOC 容器的职责"></a>IOC 容器的职责</h2><ul>
+<li>通用职责</li>
+<li>依赖处理<ul>
+<li>依赖查找</li>
+<li>依赖注入</li>
+</ul>
+</li>
+<li>生命周期管理<ul>
+<li>容器</li>
+<li>托管的资源（Java Beans或其他资源）</li>
+</ul>
+</li>
+<li>配置<ul>
+<li>容器</li>
+<li>外部化配置</li>
+<li>托管的资源（Java Beans 或 其他资源）</li>
+</ul>
+</li>
+</ul>
+<h2 id="IOC容器的实现"><a href="#IOC容器的实现" class="headerlink" title="IOC容器的实现"></a>IOC容器的实现</h2><ul>
+<li>主要实现</li>
+<li>Java SE<ul>
+<li>Java Beans</li>
+<li>Java ServiceLoader SPI</li>
+<li>JNDI （Java Naming and Directory Interface）</li>
+</ul>
+</li>
+<li>Java EE<ul>
+<li>EJB （Enterprise Java Beans）</li>
+<li>Servlet</li>
+</ul>
+</li>
+<li>开源<ul>
+<li>Apache Avalon （<a href="http://avalon.apache.org/closed.html" target="_blank" rel="noopener">http://avalon.apache.org/closed.html</a>)</li>
+<li>PicoContainer (<a href="http://picocontainer.com/" target="_blank" rel="noopener">http://picocontainer.com/</a>)</li>
+<li>Google Guice (<a href="https://github.com/google/guice" target="_blank" rel="noopener">https://github.com/google/guice</a>)</li>
+<li>Spring Framework (<a href="https://spring.io/projects/spring-framework" target="_blank" rel="noopener">https://spring.io/projects/spring-framework</a>)  * </li>
+</ul>
+</li>
+</ul>
+<h2 id="依赖查找-VS-依赖注入"><a href="#依赖查找-VS-依赖注入" class="headerlink" title="依赖查找 VS 依赖注入"></a>依赖查找 VS 依赖注入</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">依赖处理</th>
+<th style="text-align:center">实现便利性</th>
+<th style="text-align:center">代码侵入性</th>
+<th style="text-align:center">API依赖性</th>
+<th style="text-align:center">可读性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">依赖查找</td>
+<td style="text-align:center">主动获取</td>
+<td style="text-align:center">查对管繁琐</td>
+<td style="text-align:center">侵入业务逻辑</td>
+<td style="text-align:center">依赖容器API</td>
+<td style="text-align:center">良好</td>
+</tr>
+<tr>
+<td style="text-align:center">依赖注入</td>
+<td style="text-align:center">被动提供</td>
+<td style="text-align:center">相对便利</td>
+<td style="text-align:center">低侵入性</td>
+<td style="text-align:center">不依赖容器API</td>
+<td style="text-align:center">一般</td>
+</tr>
+</tbody>
+</table>
+<h2 id="沙雕面试题-—-什么时IoC？"><a href="#沙雕面试题-—-什么时IoC？" class="headerlink" title="沙雕面试题  — 什么时IoC？"></a>沙雕面试题  — 什么时IoC？</h2><p> – 简单地说， IoC 是反转控制， 类似于好菜坞原则， 主要是依赖查找和依赖注入实现。</p>
+<h2 id="996-面试题–-依赖查询和依赖注入的区别？"><a href="#996-面试题–-依赖查询和依赖注入的区别？" class="headerlink" title="996 面试题– 依赖查询和依赖注入的区别？"></a>996 面试题– 依赖查询和依赖注入的区别？</h2><p>  — 依赖查找是主动或手机依赖查询方式， 通常需要依赖容器或标准API实现，如依赖名称， 资源等方式获得对象信息，servlet API， EJB API， JNDI API； 而依赖注入则是手动或自动依赖绑定的方式， 无需依赖特定的容器和API。 </p>
+<h2 id="劝退面试题-–-Spring-作为IoC-容器有什么优势？？"><a href="#劝退面试题-–-Spring-作为IoC-容器有什么优势？？" class="headerlink" title="劝退面试题 – Spring 作为IoC 容器有什么优势？？"></a>劝退面试题 – Spring 作为IoC 容器有什么优势？？</h2><p>  – 典型的IoC 管理， 依赖查询的依赖注入<br>  AOP抽象<br>  事务抽象<br>  事机机制<br>  SPI扩展<br>  强大的第三方整合<br>  易测试性<br>  更好的面向对象</p>
+<h2 id="Spring-IoC-依赖查找"><a href="#Spring-IoC-依赖查找" class="headerlink" title="Spring IoC 依赖查找"></a>Spring IoC 依赖查找</h2><ul>
+<li>根据Bean 名称查询<ul>
+<li>实时查找</li>
+<li>延迟查找</li>
+</ul>
+</li>
+<li>根据Bean 类型查找<ul>
+<li>单个Bean 对象</li>
+<li>集合 Bean 对象</li>
+</ul>
+</li>
+<li>根据Bean 名称 + 类型查找</li>
+<li>根据Java 注解查找<ul>
+<li>单个 Bean 对象</li>
+<li>集合 Bean 对象</li>
+</ul>
+</li>
+</ul>
+<h2 id="Bean-的来源"><a href="#Bean-的来源" class="headerlink" title="Bean 的来源"></a>Bean 的来源</h2><ul>
+<li>自建的Bean， 并通过配置产生Bean实例</li>
+<li>依赖的Bean， 容器自己自动注入</li>
+<li>非Bean ， 内部容器所构建的Bean</li>
+</ul>
+<h2 id="Spring-IoC-配置元信息"><a href="#Spring-IoC-配置元信息" class="headerlink" title="Spring IoC 配置元信息"></a>Spring IoC 配置元信息</h2><ul>
+<li>Bean 定义配置<ul>
+<li>基于XML 文件</li>
+<li>基于Properties文件</li>
+<li>基于Java 注解</li>
+<li>基于Java API（专题讨论）</li>
+</ul>
+</li>
+<li>IoC 容器配置<ul>
+<li>基于XML文件</li>
+<li>基于Java注解</li>
+<li>基于Java API（专题讨论）</li>
+</ul>
+</li>
+<li>外部化属性配置<ul>
+<li>基于Java注解</li>
+</ul>
+</li>
+</ul>
+<h2 id="BeanFactory-与-ApplicationContext-倒底哪个是IoC的主要特征体理？"><a href="#BeanFactory-与-ApplicationContext-倒底哪个是IoC的主要特征体理？" class="headerlink" title="BeanFactory 与 ApplicationContext 倒底哪个是IoC的主要特征体理？"></a>BeanFactory 与 ApplicationContext 倒底哪个是IoC的主要特征体理？</h2><ul>
+<li>ApplicationContext 不仅是BeanFactory的超类， 而且还是支持很多Spring 其它特性如：<ul>
+<li>Events</li>
+<li>i18n</li>
+<li>Annotations</li>
+<li>AOP</li>
+<li>Resources</li>
+<li>Configuration Metadata</li>
+<li>Environment 抽象（Environment Abstraction)<br>在ApplicationContext中可以获取到原生功能的BeanFactory; </li>
+</ul>
+</li>
+</ul>
+<p><strong>技巧：<em>shift + fn + f6 可以重构变量名</em></strong></p>
+<h2 id="ApplicationContext-上下文对象的关键方法："><a href="#ApplicationContext-上下文对象的关键方法：" class="headerlink" title="ApplicationContext 上下文对象的关键方法："></a>ApplicationContext 上下文对象的关键方法：</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 启动应用上下文</span></span><br><span class="line">applicationContext.refresh();</span><br><span class="line"><span class="comment">// 这一步， 完成上下文的处理， 同时初始化了很多非bean对象， 如支持事件， 支持广播， 支持国际化， 支持注解等； </span></span><br><span class="line">perareBeanFactory(beanFactory);</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>&#123;</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">catch</span>(Exception e)&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">applicationContext.close();</span><br></pre></td></tr></table></figure>
+<h3 id="什么时Spring-IoC-容器？"><a href="#什么时Spring-IoC-容器？" class="headerlink" title="什么时Spring IoC 容器？"></a>什么时Spring IoC 容器？</h3><p>Spring Framework implementation of the Inversion(反转) of Control(IoC)principle.<br>IoC is also known as dependency injection（注入）(DI). It is a process where by objects define their dependencies(that is , the other objects they work with) only through constructor arguments, arguments to a factory method, or properties that are set on the object instance after it is constructed or returned from a factory method. The container then injects those dependencies when it creates the bean.</p>
+<p>依赖查找， 其实在早期的javaEE实现了。 </p>
+<h3 id="BeanFactory-与-FactoryBean"><a href="#BeanFactory-与-FactoryBean" class="headerlink" title="BeanFactory 与 FactoryBean ?"></a>BeanFactory 与 FactoryBean ?</h3><p>BeanFactory 是IoC的底层容器。<br>FactoryBean 是创建Bean的一种方式， 帮助实现复杂的初始化逻辑。 </p>
+<h3 id="Spring-IoC容器启动时做了哪些准备？"><a href="#Spring-IoC容器启动时做了哪些准备？" class="headerlink" title="Spring IoC容器启动时做了哪些准备？"></a>Spring IoC容器启动时做了哪些准备？</h3><p>IoC 配置元信息读取和解析、IoC容器生命周期、Spring事件发布、国际化等； </p>
+<h3 id="实例化-Spring-Bean"><a href="#实例化-Spring-Bean" class="headerlink" title="实例化 Spring Bean"></a>实例化 Spring Bean</h3><ul>
+<li><p>Bean 实例化（Instantiation)</p>
+<ul>
+<li>常规方式<ul>
+<li>通过构造器（配置元信息： XML、 Java注解和Java API）</li>
+<li>通过静态工厂方法（ 配置元信息： XML 和 Java API）</li>
+<li>通过Bean 工厂方法（配置元信息， XML 和 Java API）</li>
+<li>通过 FactoryBean (配置元信息： XML 、 java 注解 和 Java API)</li>
+</ul>
+</li>
+<li>特殊方式<ul>
+<li>通过ServiceLoaderFactoryBean （配置元信息： XML、 java注解和Java API）</li>
+<li>通过AutowireCapaleBeanFactory#ceateBean（java.lang.Class,int , boolean)</li>
+<li>通过BeanDefinitaionRegistry#registerBeanDefinition(String, BeanDefinition) </li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Spring-Bean延迟初始化"><a href="#Spring-Bean延迟初始化" class="headerlink" title="Spring Bean延迟初始化"></a>Spring Bean延迟初始化</h3><ul>
+<li><p>Bean 延迟初始化（lazy Initialization)</p>
+<ul>
+<li>XML 配置： &lt;bean lazy-init=”true”…/&gt;</li>
+<li>java 注解： @Lazy(true)<br>Java注解是个静态化的东西， 一旦定义就不会修改。 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Lazy</span>(value = <span class="keyword">false</span>)</span><br><span class="line"><span class="comment">// 以上注解建议不打</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p>非延迟初始化在spring应用上下文启动完成后， 被初始化 </p>
+</li>
+<li>延迟初始化，其实就是按需进行初始化。</li>
+<li>在applicationContext中refresh()方法源码中， 有一个方法<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Instantiate all remaing (non-lazy-init) singletons</span></span><br><span class="line">finishBeanFactoryInitialization(beanFactory);  </span><br><span class="line"><span class="comment">// 这个方法执行完后， 就会初始化所有非延迟初始化的bean </span></span><br><span class="line"></span><br><span class="line">在应用上下文初始化前后进行输出。</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="Spring-Bean-销毁"><a href="#Spring-Bean-销毁" class="headerlink" title="Spring Bean 销毁"></a>Spring Bean 销毁</h3><ul>
+<li>Bean 销毁（Destroy)<ul>
+<li>@PreDestroy 标注方法</li>
+<li>实现DisposableBean 接口的 destory() 方法</li>
+<li>自定义销毁方法<ul>
+<li>XML 配置： <bean destroy="destroy" ..=""></bean></li>
+<li>Java注解： @Bean(destory = “destory”)</li>
+<li>Java API: AastractBeanDefinition#setDestroyMethodName(String)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Spring-Bean-垃圾回收"><a href="#Spring-Bean-垃圾回收" class="headerlink" title="Spring Bean 垃圾回收"></a>Spring Bean 垃圾回收</h3><ul>
+<li>Bean 垃圾回收（GC）<ul>
+<li>关闭Spring 容器（应用上下文）</li>
+<li>执行GC</li>
+<li>Spring Bean 覆盖finalize() 方法被回调 </li>
+</ul>
+</li>
+</ul>
+<h3 id="依赖查找的今世前生"><a href="#依赖查找的今世前生" class="headerlink" title="依赖查找的今世前生"></a>依赖查找的今世前生</h3><ul>
+<li>单一类型依赖查找<ul>
+<li>JNDI - javax。naming。Context#lookup（javax.naming.Name)</li>
+<li>JavaBeans - java.beans.beancontext.BeanContext</li>
+</ul>
+</li>
+<li>集合类型依赖查找<ul>
+<li>java.beans.beancontext.BeanContext</li>
+</ul>
+</li>
+<li>层次性依赖查找<ul>
+<li>java.beans.beancontext.BeanContext</li>
+</ul>
+</li>
+</ul>
+<p>*<em>第45集完全没有听懂</em></p>
+<p><strong>Spring是不支持点对点的广播</strong></p>
+<h2 id="ObjectFactory-与-BeanFactory-的区别？"><a href="#ObjectFactory-与-BeanFactory-的区别？" class="headerlink" title="ObjectFactory 与 BeanFactory 的区别？"></a>ObjectFactory 与 BeanFactory 的区别？</h2><ul>
+<li>ObjectFactory 与 BeanFactory 均提供依赖查找的能力。<br>不过 ObjectFactory 仅关注一个或一种类型的Bean依赖查找， 并且自身不具备依赖查找的能力， 能力则由BeanFactory输出。</li>
+</ul>
+<p>BeanFactory则提供了单一类型、集合类型以及层次性等多种依赖查找方式； </p>
+<h2 id="BeanFactory-getBean操作是否线程安全？"><a href="#BeanFactory-getBean操作是否线程安全？" class="headerlink" title="BeanFactory.getBean操作是否线程安全？"></a>BeanFactory.getBean操作是否线程安全？</h2><p>BeanFactory.getBean方法的执行是线程安全的， 操作过程中会增加互斥锁； 在jdk6 出现偏向锁后， 一定程度上减少了锁的竞争，提升了加锁的效率 ； </p>
+<h2 id="字段注入"><a href="#字段注入" class="headerlink" title="字段注入"></a>字段注入</h2><ul>
+<li>实现方法<ul>
+<li>手动模式<ul>
+<li>Java注解配置元信息<ul>
+<li>@Autowired  会忽略掉static 静态字段。 实际是只能注入实例字段或叫对象字段。 不能注入类的静态字段， 会自动忽略掉所有static字段。 </li>
+<li>@Resource</li>
+<li>@Inject (可选)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="接口回调注入"><a href="#接口回调注入" class="headerlink" title="接口回调注入"></a>接口回调注入</h2><ul>
+<li>Aware 系列接口回调<ul>
+<li>自动模式<br>|内建接口| 说明 |<br>|:—:|:—|<br>|BeanFactoryAware|获取IoC容器 - BeanFactory |<br>|ApplicationContextAware|获取Spring 应用上下文-ApplicationContext对象|<br>|EnvironmentAware| 获取Environment对象|<br>|ResourceLoaderAware|获取资源加载器对象- ResoueceLoader|<br>|BeanClassLoaderAware|获取加载当前Bean Class 的 ClassLoader|<br>|BeanNameAware|获取当前Bean的名称| </li>
+</ul>
+</li>
+</ul>
+<h2 id="依赖注入类型选择"><a href="#依赖注入类型选择" class="headerlink" title="依赖注入类型选择"></a>依赖注入类型选择</h2><ul>
+<li>注入造型<ul>
+<li>低依赖： 构造器注入  byType*  byName  官方推荐</li>
+<li>多依赖： Setter方法注入  有个不足， 就是注入时先后顺序依赖于用户操作先后顺序，如果有注入的字段或属性有顺序要求， 这个方法注入可能会有些问题。  </li>
+<li>便利性： 字段注入 </li>
+<li>声明类： 方法注入 </li>
+</ul>
+</li>
+</ul>
+<h2 id="基础类型注入"><a href="#基础类型注入" class="headerlink" title="基础类型注入"></a>基础类型注入</h2><ul>
+<li>基础类型<ul>
+<li>原生类型（Primitive）： boolean、byte 、 char 、 short、int、float、long、double</li>
+<li>标量类型（Scalar)： Number、Character、Boolean、 Enum、Locale、Charset、Currency、Properties、UUID</li>
+<li>常规类型(General): Object、String、TimeZone、Calendar、Optional</li>
+<li>Spring类型： Resource、InputSource、Formatter</li>
+</ul>
+</li>
+</ul>
+<h2 id="集合类型注入"><a href="#集合类型注入" class="headerlink" title="集合类型注入"></a>集合类型注入</h2><ul>
+<li><p>集合类型</p>
+<ul>
+<li><p>数组类型（Array）： 原生类型、标量类型、 常规类型、Spring类型</p>
+</li>
+<li><p>集合类型（Collection）</p>
+<ul>
+<li>Collection： List、Set、(Sortedset、NavigableSet、EnumSet)</li>
+<li>Map: Properties</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="限定注入"><a href="#限定注入" class="headerlink" title="限定注入"></a>限定注入</h2><ul>
+<li>使用注解 @Qualifier 限定<ul>
+<li>通过Bean 名称限定</li>
+<li>通过分组限定</li>
+</ul>
+</li>
+<li>基于注解 @Qualifier 扩展限定<ul>
+<li>自定义注解 - 如 Spring Cloud @LoadBalanced </li>
+</ul>
+</li>
+</ul>
+<h2 id="延迟依赖注入"><a href="#延迟依赖注入" class="headerlink" title="延迟依赖注入"></a>延迟依赖注入</h2><ul>
+<li>使用 API ObjectFactory 延迟注入<ul>
+<li>单一类型</li>
+<li>集合类型</li>
+</ul>
+</li>
+<li>使用API Objectprovider 延迟注入 （推荐）， 其实就是扩展了ObjectFactory的类<ul>
+<li>单一类型</li>
+<li>集合类型</li>
+</ul>
+</li>
+</ul>
+<h2 id="依赖处理过程"><a href="#依赖处理过程" class="headerlink" title="依赖处理过程"></a>依赖处理过程</h2><ul>
+<li>基础知识<ul>
+<li>入口 - DefaultListableBeanFactory # resolveDependency</li>
+<li>依赖描述符： DependencyDescriptor</li>
+<li>自定绑定候选处理器 - AutowireCandidateResolver </li>
+</ul>
+</li>
+</ul>
+<h2 id="Autowired-注入"><a href="#Autowired-注入" class="headerlink" title="@Autowired 注入"></a>@Autowired 注入</h2><ul>
+<li>@Autowired 注入过程<ul>
+<li>元信息解析</li>
+<li>依赖查找</li>
+<li>依赖注入（ 字段、 方法） </li>
+</ul>
+</li>
+<li>核心类 AutowiredAnnotationBeanPostProcessor<ul>
+<li>postProcessMergedBeanDefinition</li>
+<li>postProcessProperties</li>
+</ul>
+</li>
+</ul>
+<h2 id="Inject-注入"><a href="#Inject-注入" class="headerlink" title="@Inject 注入"></a>@Inject 注入</h2><ul>
+<li><p>@Inject 注入过程</p>
+<ul>
+<li>如果JSR-330 存在于ClassPath 中， 复用AutowiredAnnotationBeanPostProcessor 实现。 </li>
+<li>可以处理 @Autowired @Value @Inject</li>
+<li>AutowiredAnnotationBeanPostProcessor 进行了 @Autowired 和 @Inject 的注解处理。 处理逻辑基本一致。</li>
+</ul>
+</li>
+<li><p>CommonAnnotationBeanPostProcessor </p>
+<ul>
+<li>注入注解<ul>
+<li>javax.xml.ws.WebServiceRef</li>
+<li>javax.ejb.EJB</li>
+<li>javax.annotation.Resource</li>
+</ul>
+</li>
+<li>生命周期注解<ul>
+<li>javax.annotation.PostConstruct</li>
+<li>javax.annotation.PreDestroy</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="如何自定义依赖注入"><a href="#如何自定义依赖注入" class="headerlink" title="如何自定义依赖注入"></a>如何自定义依赖注入</h2><ul>
+<li><p>基于AutowiredAnnotationBeanPostProcessor 实现</p>
+</li>
+<li><p>自定义实现</p>
+<ul>
+<li>生命周期处理<ul>
+<li>InstanticationAwareBeanPostProcessor</li>
+<li>MergedBeanDefinitionPostProcessor</li>
+</ul>
+</li>
+<li>元数据<ul>
+<li>InjectedElement</li>
+<li>InjectionMetadata</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="有多少种依赖注入的方式？"><a href="#有多少种依赖注入的方式？" class="headerlink" title="有多少种依赖注入的方式？"></a>有多少种依赖注入的方式？</h3><ul>
+<li>构造器注入 ， 少依赖， 强制依赖的情况下</li>
+<li>Setter 注入， 多依赖， 弱依赖</li>
+<li>字段注入   开发比较便利</li>
+<li>方法注入   @Bean 方便声明， </li>
+<li>接口回调注入   比较特殊的注入方法， 一般可以做一些别的事情， 如生命周期式的。 </li>
+</ul>
+<h3 id="你偏好构造器注入还是Setter注入？"><a href="#你偏好构造器注入还是Setter注入？" class="headerlink" title="你偏好构造器注入还是Setter注入？"></a>你偏好构造器注入还是Setter注入？</h3><p>  两种依赖注入的方式均可使用， 如果是必须依赖的话， 那么推荐使用构造器注入， Setter注入用于可选依赖。<br>  少参数， 建议首先构造器注入， </p>
+<h3 id="Spring-依赖注入的来源有哪些？"><a href="#Spring-依赖注入的来源有哪些？" class="headerlink" title="Spring 依赖注入的来源有哪些？"></a>Spring 依赖注入的来源有哪些？</h3><ul>
+<li>依赖注入是用 ResolverDependency </li>
+<li>依赖查找是用 BeanFactory.getBean() </li>
+</ul>
+
+      
+      <blockquote>
+        
+        <strong>PermaLink: </strong><br><a href="https://www.ant-loiter.com/2020/06/18/SpringFormwork001/">https://www.ant-loiter.com/2020/06/18/SpringFormwork001/</a>
+      </blockquote>
+    </div>
+    <footer class="mdui-card-actions">
+      
+        <a class="mdui-ripple article_categories-link" href="/categories/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud</a>
+      
+      
+        <a class="mdui-ripple article_tags-link" href="/tags/Spring-Framework-SpringBoot-SpringCloud/">Spring Framework SpringBoot SpringCloud</a>
+      
+    </footer>
+    
+  </article>
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+  <script>$("#main article .mdui-card-content img.fancybox").on("click",function(e){$.fancybox.open({src:$(this).attr("src")});});</script>
+
+
+  <nav id="paginator">
+    
+      <a rel="prev" class="extend prev" href="/2020/06/19/MySQL8-0-20-Master-Slave-replicationConfig/">
+        <button aria-label="prev" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_back</i></button>
+        <span class="mdui-p-x-3" mdui-tooltip="{content: 'MySQL8.0.20_Master_Slave_replicationConfig'}">Prev</span>
+      </a>
+    
+    <div class="spacer"></div>
+    
+      <a rel="next" class="extend next" href="/2020/06/16/distributed-ku-table/">
+        <span class="mdui-p-x-3" mdui-tooltip="{content: 'distributed_ku_table'}">Next</span>
+        <button aria-label="next" class="mdui-btn mdui-btn-raised mdui-btn-icon mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_forward</i></button>
+      </a>
+    
+  </nav>
+
+
+
+</main>
+  <footer id="footer" class="mdui-m-t-5 mdui-p-y-3 mdui-color-theme">
+  <div class="mdui-p-y-0 mdui-text-center">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  </div>
+  <div class="mdui-p-y-1 mdui-text-center">
+    Copyright &copy; 2020 chenhj(brenda)<br>
+    Powered by <a href="https://hexo.io/" target="_blank" class="mdui-text-color-theme-accent">Hexo</a>
+    
+  </div>
+</footer>
+  <button id="gotop" class="mdui-fab mdui-fab-fixed mdui-fab-hide mdui-color-theme-accent mdui-ripple"><i class="mdui-icon material-icons">arrow_upward</i></button>
+  
+  <script src="/js/mdui.js"></script>
+<script src="/js/script.js"></script>
+  <script src="/custom.js"></script>
+</body>
+</html>
